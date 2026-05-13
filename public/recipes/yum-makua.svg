@@ -1,0 +1,16 @@
+<svg width="640" height="420" viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5A335F"/>
+      <stop offset="100%" stop-color="#8A5B7A"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+  <circle cx="320" cy="210" r="145" fill="#ECE6E1"/>
+  <circle cx="320" cy="210" r="122" fill="#89B26A"/>
+  <ellipse cx="278" cy="210" rx="32" ry="20" fill="#6B4C7A"/>
+  <ellipse cx="360" cy="185" rx="32" ry="20" fill="#6B4C7A"/>
+  <circle cx="340" cy="240" r="10" fill="#D53939"/>
+  <circle cx="290" cy="175" r="10" fill="#D53939"/>
+  <text x="36" y="58" fill="#FFFFFF" font-size="34" font-family="Sarabun, sans-serif" font-weight="700">ย้้ามะเขือ</text>
+</svg>

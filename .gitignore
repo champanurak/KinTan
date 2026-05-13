@@ -1,0 +1,8 @@
+.next
+node_modules
+out
+.env.local
+.env
+.DS_Store
+.playwright-mcp
+docs/screenshots

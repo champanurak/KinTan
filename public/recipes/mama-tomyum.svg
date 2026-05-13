@@ -1,0 +1,16 @@
+<svg width="640" height="420" viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9E4B1B"/>
+      <stop offset="100%" stop-color="#D17A2C"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+  <circle cx="320" cy="210" r="145" fill="#F5EBDD"/>
+  <circle cx="320" cy="210" r="120" fill="#D88C3A"/>
+  <path d="M240 220c40-35 120-35 160 0" stroke="#F8E7AE" stroke-width="10" fill="none"/>
+  <path d="M248 245c50-32 96-32 144 0" stroke="#F8E7AE" stroke-width="10" fill="none"/>
+  <circle cx="280" cy="180" r="14" fill="#8C4B2B"/>
+  <circle cx="370" cy="240" r="14" fill="#8C4B2B"/>
+  <text x="36" y="58" fill="#FFFFFF" font-size="34" font-family="Sarabun, sans-serif" font-weight="700">มาม่าต้มย้าไก่</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg width="640" height="420" viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2E5B56"/>
+      <stop offset="100%" stop-color="#86B2A8"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+  <circle cx="320" cy="210" r="145" fill="#EDF3EE"/>
+  <circle cx="320" cy="210" r="122" fill="#D7E4D4"/>
+  <circle cx="280" cy="190" r="20" fill="#C89F7A"/>
+  <circle cx="350" cy="235" r="20" fill="#C89F7A"/>
+  <ellipse cx="320" cy="170" rx="30" ry="16" fill="#7FAA6D"/>
+  <ellipse cx="260" cy="245" rx="30" ry="16" fill="#7FAA6D"/>
+  <text x="36" y="58" fill="#FFFFFF" font-size="34" font-family="Sarabun, sans-serif" font-weight="700">ต้มจืดไก่สับ</text>
+</svg>
