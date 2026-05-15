@@ -6,3 +6,4 @@ out
 .DS_Store
 .playwright-mcp
 docs/screenshots
+.vercel
