@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Heart, X, ShoppingCart, Lightbulb, CircleCheckBig, Minus, Plus } from "lucide-react";
+import {
+  Heart,
+  X,
+  ShoppingCart,
+  Lightbulb,
+  CircleCheckBig,
+  Minus,
+  Plus,
+} from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
 
 interface IngredientItem {
@@ -92,15 +100,69 @@ const menus: MenuItem[] = [
     recipeImage: "/recipes/pad-krapao.svg",
     matchKeywords: ["ไก่", "กะเพรา", "กระเทียม", "พริก", "น้ำปลา"],
     ingredients: [
-      { name: "อกไก่สับ", required: 250, unit: "กรัม", emoji: "🥩", matchKey: "ไก่" },
-      { name: "ใบกะเพรา", required: 1, unit: "ถ้วย", emoji: "🌿", matchKey: "กะเพรา" },
-      { name: "กระเทียมสับ", required: 1, unit: "ช้อนโต๊ะ", emoji: "🧄", matchKey: "กระเทียม" },
-      { name: "พริกสด", required: 5, unit: "เม็ด", emoji: "🌶️", matchKey: "พริก" },
-      { name: "น้ำมันพืช", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมัน" },
-      { name: "น้ำมันหอย", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมันหอย" },
-      { name: "น้ำปลา", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "น้ำปลา" },
-      { name: "ซีอิ๊วขาว", required: 0.5, unit: "ช้อนชา", emoji: "🫙", matchKey: "ซีอิ๊ว" },
-      { name: "น้ำตาล", required: 0.5, unit: "ช้อนชา", emoji: "🧂", matchKey: "น้ำตาล" },
+      {
+        name: "อกไก่สับ",
+        required: 250,
+        unit: "กรัม",
+        emoji: "🥩",
+        matchKey: "ไก่",
+      },
+      {
+        name: "ใบกะเพรา",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🌿",
+        matchKey: "กะเพรา",
+      },
+      {
+        name: "กระเทียมสับ",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🧄",
+        matchKey: "กระเทียม",
+      },
+      {
+        name: "พริกสด",
+        required: 5,
+        unit: "เม็ด",
+        emoji: "🌶️",
+        matchKey: "พริก",
+      },
+      {
+        name: "น้ำมันพืช",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมัน",
+      },
+      {
+        name: "น้ำมันหอย",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมันหอย",
+      },
+      {
+        name: "น้ำปลา",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "น้ำปลา",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
+      {
+        name: "น้ำตาล",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "น้ำตาล",
+      },
     ],
     steps: [
       "โขลกพริกกับกระเทียมพอหยาบ",
@@ -123,12 +185,48 @@ const menus: MenuItem[] = [
     recipeImage: "/recipes/suki-clear.svg",
     matchKeywords: ["ผักกาด", "หมู", "ไก่", "วุ้นเส้น", "ไข่", "น้ำจิ้มสุกี้"],
     ingredients: [
-      { name: "น้ำซุปหมู/ไก่", required: 600, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
-      { name: "ผักกาดขาว", required: 1, unit: "ถ้วย", emoji: "🥬", matchKey: "ผักกาด" },
-      { name: "หมูหรือไก่", required: 200, unit: "กรัม", emoji: "🥩", matchKey: "หมู" },
-      { name: "วุ้นเส้น (แช่น้ำแล้ว)", required: 1, unit: "กำ", emoji: "🍜", matchKey: "วุ้นเส้น" },
-      { name: "ไข่ไก่", required: 1, unit: "ฟอง", emoji: "🥚", matchKey: "ไข่" },
-      { name: "น้ำจิ้มสุกี้", required: 2, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำจิ้มสุกี้" },
+      {
+        name: "น้ำซุปหมู/ไก่",
+        required: 600,
+        unit: "มล.",
+        emoji: "💧",
+        matchKey: "น้ำ",
+      },
+      {
+        name: "ผักกาดขาว",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🥬",
+        matchKey: "ผักกาด",
+      },
+      {
+        name: "หมูหรือไก่",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🥩",
+        matchKey: "หมู",
+      },
+      {
+        name: "วุ้นเส้น (แช่น้ำแล้ว)",
+        required: 1,
+        unit: "กำ",
+        emoji: "🍜",
+        matchKey: "วุ้นเส้น",
+      },
+      {
+        name: "ไข่ไก่",
+        required: 1,
+        unit: "ฟอง",
+        emoji: "🥚",
+        matchKey: "ไข่",
+      },
+      {
+        name: "น้ำจิ้มสุกี้",
+        required: 2,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำจิ้มสุกี้",
+      },
     ],
     steps: [
       "แช่วุ้นเส้นในน้ำเย็น 15 นาทีให้นุ่ม",
@@ -150,13 +248,55 @@ const menus: MenuItem[] = [
     imageClass: "from-amber-100 to-orange-100",
     matchKeywords: ["ข้าว", "แครอท", "ข้าวโพด", "ไข่", "ซีอิ๊ว"],
     ingredients: [
-      { name: "ข้าวสวย (ค้างคืน)", required: 1.5, unit: "ถ้วย", emoji: "🍚", matchKey: "ข้าว" },
-      { name: "แครอทหั่นเต๋า", required: 0.5, unit: "ถ้วย", emoji: "🥕", matchKey: "แครอท" },
-      { name: "ข้าวโพด", required: 0.5, unit: "ถ้วย", emoji: "🌽", matchKey: "ข้าวโพด" },
-      { name: "ไข่ไก่", required: 1, unit: "ฟอง", emoji: "🥚", matchKey: "ไข่" },
-      { name: "น้ำมันพืช", required: 2, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมัน" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "ซีอิ๊ว" },
-      { name: "พริกไทยป่น", required: 0.5, unit: "ช้อนชา", emoji: "⚫", matchKey: "พริกไทย" },
+      {
+        name: "ข้าวสวย (ค้างคืน)",
+        required: 1.5,
+        unit: "ถ้วย",
+        emoji: "🍚",
+        matchKey: "ข้าว",
+      },
+      {
+        name: "แครอทหั่นเต๋า",
+        required: 0.5,
+        unit: "ถ้วย",
+        emoji: "🥕",
+        matchKey: "แครอท",
+      },
+      {
+        name: "ข้าวโพด",
+        required: 0.5,
+        unit: "ถ้วย",
+        emoji: "🌽",
+        matchKey: "ข้าวโพด",
+      },
+      {
+        name: "ไข่ไก่",
+        required: 1,
+        unit: "ฟอง",
+        emoji: "🥚",
+        matchKey: "ไข่",
+      },
+      {
+        name: "น้ำมันพืช",
+        required: 2,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมัน",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
+      {
+        name: "พริกไทยป่น",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "⚫",
+        matchKey: "พริกไทย",
+      },
     ],
     steps: [
       "ตั้งกระทะใส่น้ำมันพืช ตอกไข่ลงผัดให้สุกแบบคลุกเคล้า",
@@ -180,11 +320,41 @@ const menus: MenuItem[] = [
     matchKeywords: ["เต้าหู้", "หมู", "ผักกาด", "ต้นหอม", "ซีอิ๊ว"],
     ingredients: [
       { name: "น้ำ", required: 600, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
-      { name: "เต้าหู้ไข่", required: 2, unit: "หลอด", emoji: "🟡", matchKey: "เต้าหู้" },
-      { name: "หมูสับ", required: 200, unit: "กรัม", emoji: "🥩", matchKey: "หมู" },
-      { name: "ผักกาดขาว", required: 1, unit: "ถ้วย", emoji: "🥬", matchKey: "ผักกาด" },
-      { name: "ต้นหอม", required: 1, unit: "ต้น", emoji: "🌱", matchKey: "ต้นหอม" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "ซีอิ๊ว" },
+      {
+        name: "เต้าหู้ไข่",
+        required: 2,
+        unit: "หลอด",
+        emoji: "🟡",
+        matchKey: "เต้าหู้",
+      },
+      {
+        name: "หมูสับ",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🥩",
+        matchKey: "หมู",
+      },
+      {
+        name: "ผักกาดขาว",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🥬",
+        matchKey: "ผักกาด",
+      },
+      {
+        name: "ต้นหอม",
+        required: 1,
+        unit: "ต้น",
+        emoji: "🌱",
+        matchKey: "ต้นหอม",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
     ],
     steps: [
       "ต้มน้ำ 600 มล. ให้เดือด ปั้นหมูสับเป็นก้อนเล็กๆ ใส่ลงหม้อ",
@@ -206,14 +376,56 @@ const menus: MenuItem[] = [
     imageClass: "from-yellow-100 to-orange-100",
     matchKeywords: ["ไก่", "ข้าว", "ขิง", "กระเทียม"],
     ingredients: [
-      { name: "อกไก่", required: 300, unit: "กรัม", emoji: "🍗", matchKey: "ไก่" },
+      {
+        name: "อกไก่",
+        required: 300,
+        unit: "กรัม",
+        emoji: "🍗",
+        matchKey: "ไก่",
+      },
       { name: "น้ำ", required: 1, unit: "ลิตร", emoji: "💧", matchKey: "น้ำ" },
-      { name: "ข้าวหอมมะลิ", required: 2, unit: "ถ้วย", emoji: "🍚", matchKey: "ข้าว" },
-      { name: "ขิงแก่", required: 5, unit: "แว่น", emoji: "🌱", matchKey: "ขิง" },
-      { name: "กระเทียม", required: 4, unit: "กลีบ", emoji: "🧄", matchKey: "กระเทียม" },
-      { name: "เกลือ", required: 1, unit: "ช้อนชา", emoji: "🧂", matchKey: "เกลือ" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "ซีอิ๊ว" },
-      { name: "น้ำจิ้มเต้าเจี้ยว", required: 2, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำจิ้ม" },
+      {
+        name: "ข้าวหอมมะลิ",
+        required: 2,
+        unit: "ถ้วย",
+        emoji: "🍚",
+        matchKey: "ข้าว",
+      },
+      {
+        name: "ขิงแก่",
+        required: 5,
+        unit: "แว่น",
+        emoji: "🌱",
+        matchKey: "ขิง",
+      },
+      {
+        name: "กระเทียม",
+        required: 4,
+        unit: "กลีบ",
+        emoji: "🧄",
+        matchKey: "กระเทียม",
+      },
+      {
+        name: "เกลือ",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "เกลือ",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
+      {
+        name: "น้ำจิ้มเต้าเจี้ยว",
+        required: 2,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำจิ้ม",
+      },
     ],
     steps: [
       "ต้มน้ำ 1 ลิตร กับขิงและกระเทียม ใส่ไก่ต้มประมาณ 25 นาที ใส่เกลือ",
@@ -235,15 +447,69 @@ const menus: MenuItem[] = [
     imageClass: "from-amber-100 to-yellow-100",
     matchKeywords: ["ไก่", "กะทิ", "ข่า", "ตะไคร้"],
     ingredients: [
-      { name: "ไก่หั่นชิ้น", required: 250, unit: "กรัม", emoji: "🍗", matchKey: "ไก่" },
-      { name: "กะทิ", required: 400, unit: "มล.", emoji: "🥥", matchKey: "กะทิ" },
-      { name: "ข่าอ่อน", required: 6, unit: "แว่น", emoji: "🌱", matchKey: "ข่า" },
-      { name: "ตะไคร้", required: 1, unit: "ต้น", emoji: "🌿", matchKey: "ตะไคร้" },
-      { name: "ใบมะกรูด", required: 4, unit: "ใบ", emoji: "🍃", matchKey: "ใบมะกรูด" },
-      { name: "เห็ด", required: 100, unit: "กรัม", emoji: "🍄", matchKey: "เห็ด" },
-      { name: "น้ำปลา", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำปลา" },
-      { name: "มะนาว", required: 1, unit: "ลูก", emoji: "🍋", matchKey: "มะนาว" },
-      { name: "น้ำตาลปี๊บ", required: 0.5, unit: "ช้อนชา", emoji: "🧂", matchKey: "น้ำตาล" },
+      {
+        name: "ไก่หั่นชิ้น",
+        required: 250,
+        unit: "กรัม",
+        emoji: "🍗",
+        matchKey: "ไก่",
+      },
+      {
+        name: "กะทิ",
+        required: 400,
+        unit: "มล.",
+        emoji: "🥥",
+        matchKey: "กะทิ",
+      },
+      {
+        name: "ข่าอ่อน",
+        required: 6,
+        unit: "แว่น",
+        emoji: "🌱",
+        matchKey: "ข่า",
+      },
+      {
+        name: "ตะไคร้",
+        required: 1,
+        unit: "ต้น",
+        emoji: "🌿",
+        matchKey: "ตะไคร้",
+      },
+      {
+        name: "ใบมะกรูด",
+        required: 4,
+        unit: "ใบ",
+        emoji: "🍃",
+        matchKey: "ใบมะกรูด",
+      },
+      {
+        name: "เห็ด",
+        required: 100,
+        unit: "กรัม",
+        emoji: "🍄",
+        matchKey: "เห็ด",
+      },
+      {
+        name: "น้ำปลา",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำปลา",
+      },
+      {
+        name: "มะนาว",
+        required: 1,
+        unit: "ลูก",
+        emoji: "🍋",
+        matchKey: "มะนาว",
+      },
+      {
+        name: "น้ำตาลปี๊บ",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "น้ำตาล",
+      },
     ],
     steps: [
       "เคี่ยวกะทิกับข่า ตะไคร้ และใบมะกรูดให้หอม",
@@ -265,11 +531,41 @@ const menus: MenuItem[] = [
     imageClass: "from-orange-100 to-red-100",
     matchKeywords: ["ไก่", "กระเทียม", "น้ำผึ้ง"],
     ingredients: [
-      { name: "ไก่", required: 300, unit: "กรัม", emoji: "🍗", matchKey: "ไก่" },
-      { name: "ซอสบาร์บีคิว", required: 3, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "ซอส" },
-      { name: "กระเทียม", required: 3, unit: "กลีบ", emoji: "🧄", matchKey: "กระเทียม" },
-      { name: "น้ำผึ้ง", required: 1, unit: "ช้อนโต๊ะ", emoji: "🍯", matchKey: "น้ำผึ้ง" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "ซีอิ๊ว" },
+      {
+        name: "ไก่",
+        required: 300,
+        unit: "กรัม",
+        emoji: "🍗",
+        matchKey: "ไก่",
+      },
+      {
+        name: "ซอสบาร์บีคิว",
+        required: 3,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "ซอส",
+      },
+      {
+        name: "กระเทียม",
+        required: 3,
+        unit: "กลีบ",
+        emoji: "🧄",
+        matchKey: "กระเทียม",
+      },
+      {
+        name: "น้ำผึ้ง",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🍯",
+        matchKey: "น้ำผึ้ง",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
     ],
     steps: [
       "หมักไก่กับซอสบาร์บีคิว กระเทียม น้ำผึ้ง และซีอิ๊ว 20 นาที",
@@ -292,10 +588,34 @@ const menus: MenuItem[] = [
     matchKeywords: ["นม", "กล้วย", "น้ำผึ้ง"],
     ingredients: [
       { name: "นมสด", required: 200, unit: "มล.", emoji: "🥛", matchKey: "นม" },
-      { name: "กล้วย", required: 1, unit: "ลูก", emoji: "🍌", matchKey: "กล้วย" },
-      { name: "สตรอว์เบอร์รี่", required: 5, unit: "ลูก", emoji: "🍓", matchKey: "ผลไม้" },
-      { name: "น้ำผึ้ง", required: 1, unit: "ช้อนชา", emoji: "🍯", matchKey: "น้ำผึ้ง" },
-      { name: "น้ำแข็ง", required: 1, unit: "ถ้วย", emoji: "🧊", matchKey: "น้ำแข็ง" },
+      {
+        name: "กล้วย",
+        required: 1,
+        unit: "ลูก",
+        emoji: "🍌",
+        matchKey: "กล้วย",
+      },
+      {
+        name: "สตรอว์เบอร์รี่",
+        required: 5,
+        unit: "ลูก",
+        emoji: "🍓",
+        matchKey: "ผลไม้",
+      },
+      {
+        name: "น้ำผึ้ง",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🍯",
+        matchKey: "น้ำผึ้ง",
+      },
+      {
+        name: "น้ำแข็ง",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🧊",
+        matchKey: "น้ำแข็ง",
+      },
     ],
     steps: [
       "ใส่ผลไม้ทั้งหมดลงในเครื่องปั่น",
@@ -317,9 +637,27 @@ const menus: MenuItem[] = [
     matchKeywords: ["นม", "น้ำตาล"],
     ingredients: [
       { name: "นมสด", required: 200, unit: "มล.", emoji: "🥛", matchKey: "นม" },
-      { name: "โอวัลติน", required: 3, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "โอวัลติน" },
-      { name: "น้ำร้อน", required: 50, unit: "มล.", emoji: "☕", matchKey: "น้ำ" },
-      { name: "น้ำตาล", required: 1, unit: "ช้อนชา", emoji: "🧂", matchKey: "น้ำตาล" },
+      {
+        name: "โอวัลติน",
+        required: 3,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "โอวัลติน",
+      },
+      {
+        name: "น้ำร้อน",
+        required: 50,
+        unit: "มล.",
+        emoji: "☕",
+        matchKey: "น้ำ",
+      },
+      {
+        name: "น้ำตาล",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "น้ำตาล",
+      },
     ],
     steps: [
       "ละลายโอวัลตินกับน้ำร้อนเล็กน้อย",
@@ -341,9 +679,27 @@ const menus: MenuItem[] = [
     matchKeywords: ["นม", "ไข่", "น้ำตาล"],
     ingredients: [
       { name: "นมสด", required: 500, unit: "มล.", emoji: "🥛", matchKey: "นม" },
-      { name: "ไข่ไก่", required: 3, unit: "ฟอง", emoji: "🥚", matchKey: "ไข่" },
-      { name: "น้ำตาล", required: 4, unit: "ช้อนโต๊ะ", emoji: "🧂", matchKey: "น้ำตาล" },
-      { name: "กลิ่นวานิลา", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "วานิลา" },
+      {
+        name: "ไข่ไก่",
+        required: 3,
+        unit: "ฟอง",
+        emoji: "🥚",
+        matchKey: "ไข่",
+      },
+      {
+        name: "น้ำตาล",
+        required: 4,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🧂",
+        matchKey: "น้ำตาล",
+      },
+      {
+        name: "กลิ่นวานิลา",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "วานิลา",
+      },
     ],
     steps: [
       "ตีไข่กับน้ำตาลให้เข้ากัน",
@@ -365,12 +721,48 @@ const menus: MenuItem[] = [
     imageClass: "from-stone-100 to-amber-100",
     matchKeywords: ["เห็ด", "กระเทียม"],
     ingredients: [
-      { name: "เห็ดหอม", required: 200, unit: "กรัม", emoji: "🍄", matchKey: "เห็ด" },
-      { name: "น้ำมันพืช", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมัน" },
-      { name: "น้ำมันหอย", required: 2, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมันหอย" },
-      { name: "กระเทียม", required: 4, unit: "กลีบ", emoji: "🧄", matchKey: "กระเทียม" },
-      { name: "พริกไทย", required: 0.5, unit: "ช้อนชา", emoji: "⚫", matchKey: "พริกไทย" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "ซีอิ๊ว" },
+      {
+        name: "เห็ดหอม",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🍄",
+        matchKey: "เห็ด",
+      },
+      {
+        name: "น้ำมันพืช",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมัน",
+      },
+      {
+        name: "น้ำมันหอย",
+        required: 2,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมันหอย",
+      },
+      {
+        name: "กระเทียม",
+        required: 4,
+        unit: "กลีบ",
+        emoji: "🧄",
+        matchKey: "กระเทียม",
+      },
+      {
+        name: "พริกไทย",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "⚫",
+        matchKey: "พริกไทย",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
     ],
     steps: [
       "ตั้งกระทะใส่น้ำมันพืช ผัดกระเทียมด้วยไฟกลางจนหอม",
@@ -391,13 +783,49 @@ const menus: MenuItem[] = [
     imageClass: "from-red-100 to-orange-100",
     matchKeywords: ["เห็ด", "ตะไคร้", "พริก"],
     ingredients: [
-      { name: "เห็ดหอม", required: 150, unit: "กรัม", emoji: "🍄", matchKey: "เห็ด" },
-      { name: "ตะไคร้", required: 1, unit: "ต้น", emoji: "🌿", matchKey: "ตะไคร้" },
+      {
+        name: "เห็ดหอม",
+        required: 150,
+        unit: "กรัม",
+        emoji: "🍄",
+        matchKey: "เห็ด",
+      },
+      {
+        name: "ตะไคร้",
+        required: 1,
+        unit: "ต้น",
+        emoji: "🌿",
+        matchKey: "ตะไคร้",
+      },
       { name: "ข่า", required: 3, unit: "แว่น", emoji: "🌱", matchKey: "ข่า" },
-      { name: "ใบมะกรูด", required: 3, unit: "ใบ", emoji: "🍃", matchKey: "ใบมะกรูด" },
-      { name: "พริกขี้หนู", required: 3, unit: "เม็ด", emoji: "🌶️", matchKey: "พริก" },
-      { name: "น้ำปลา", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำปลา" },
-      { name: "มะนาว", required: 1, unit: "ลูก", emoji: "🍋", matchKey: "มะนาว" },
+      {
+        name: "ใบมะกรูด",
+        required: 3,
+        unit: "ใบ",
+        emoji: "🍃",
+        matchKey: "ใบมะกรูด",
+      },
+      {
+        name: "พริกขี้หนู",
+        required: 3,
+        unit: "เม็ด",
+        emoji: "🌶️",
+        matchKey: "พริก",
+      },
+      {
+        name: "น้ำปลา",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำปลา",
+      },
+      {
+        name: "มะนาว",
+        required: 1,
+        unit: "ลูก",
+        emoji: "🍋",
+        matchKey: "มะนาว",
+      },
     ],
     steps: [
       "ต้มน้ำ 400 มล. กับตะไคร้ ข่า และใบมะกรูดจนเดือด",
@@ -419,11 +847,41 @@ const menus: MenuItem[] = [
     imageClass: "from-yellow-100 to-lime-100",
     matchKeywords: ["เต้าหู้", "กระเทียม", "ซีอิ๊ว"],
     ingredients: [
-      { name: "เต้าหู้แข็ง", required: 200, unit: "กรัม", emoji: "🟡", matchKey: "เต้าหู้" },
-      { name: "กระเทียม", required: 5, unit: "กลีบ", emoji: "🧄", matchKey: "กระเทียม" },
-      { name: "น้ำมันพืช", required: 3, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมัน" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "ซีอิ๊ว" },
-      { name: "พริกไทย", required: 0.5, unit: "ช้อนชา", emoji: "⚫", matchKey: "พริกไทย" },
+      {
+        name: "เต้าหู้แข็ง",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🟡",
+        matchKey: "เต้าหู้",
+      },
+      {
+        name: "กระเทียม",
+        required: 5,
+        unit: "กลีบ",
+        emoji: "🧄",
+        matchKey: "กระเทียม",
+      },
+      {
+        name: "น้ำมันพืช",
+        required: 3,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมัน",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
+      {
+        name: "พริกไทย",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "⚫",
+        matchKey: "พริกไทย",
+      },
     ],
     steps: [
       "หั่นเต้าหู้เป็นแว่น ซับน้ำให้แห้ง",
@@ -444,13 +902,49 @@ const menus: MenuItem[] = [
     imageClass: "from-red-100 to-pink-100",
     matchKeywords: ["เต้าหู้", "ตะไคร้", "พริก"],
     ingredients: [
-      { name: "เต้าหู้", required: 150, unit: "กรัม", emoji: "🟡", matchKey: "เต้าหู้" },
-      { name: "ตะไคร้", required: 1, unit: "ต้น", emoji: "🌿", matchKey: "ตะไคร้" },
+      {
+        name: "เต้าหู้",
+        required: 150,
+        unit: "กรัม",
+        emoji: "🟡",
+        matchKey: "เต้าหู้",
+      },
+      {
+        name: "ตะไคร้",
+        required: 1,
+        unit: "ต้น",
+        emoji: "🌿",
+        matchKey: "ตะไคร้",
+      },
       { name: "ข่า", required: 3, unit: "แว่น", emoji: "🌱", matchKey: "ข่า" },
-      { name: "ใบมะกรูด", required: 3, unit: "ใบ", emoji: "🍃", matchKey: "ใบมะกรูด" },
-      { name: "พริกขี้หนู", required: 2, unit: "เม็ด", emoji: "🌶️", matchKey: "พริก" },
-      { name: "น้ำปลา", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำปลา" },
-      { name: "มะนาว", required: 1, unit: "ลูก", emoji: "🍋", matchKey: "มะนาว" },
+      {
+        name: "ใบมะกรูด",
+        required: 3,
+        unit: "ใบ",
+        emoji: "🍃",
+        matchKey: "ใบมะกรูด",
+      },
+      {
+        name: "พริกขี้หนู",
+        required: 2,
+        unit: "เม็ด",
+        emoji: "🌶️",
+        matchKey: "พริก",
+      },
+      {
+        name: "น้ำปลา",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำปลา",
+      },
+      {
+        name: "มะนาว",
+        required: 1,
+        unit: "ลูก",
+        emoji: "🍋",
+        matchKey: "มะนาว",
+      },
     ],
     steps: [
       "ต้มน้ำ 400 มล. กับตะไคร้ ข่า และใบมะกรูดจนเดือด",
@@ -472,14 +966,56 @@ const menus: MenuItem[] = [
     imageClass: "from-orange-100 to-amber-100",
     matchKeywords: ["แครอท", "กะทิ"],
     ingredients: [
-      { name: "แครอท", required: 2, unit: "หัว", emoji: "🥕", matchKey: "แครอท" },
-      { name: "กะทิ", required: 400, unit: "มล.", emoji: "🥥", matchKey: "กะทิ" },
+      {
+        name: "แครอท",
+        required: 2,
+        unit: "หัว",
+        emoji: "🥕",
+        matchKey: "แครอท",
+      },
+      {
+        name: "กะทิ",
+        required: 400,
+        unit: "มล.",
+        emoji: "🥥",
+        matchKey: "กะทิ",
+      },
       { name: "น้ำ", required: 200, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
-      { name: "ผงกะหรี่", required: 2, unit: "ช้อนชา", emoji: "🫙", matchKey: "กะหรี่" },
-      { name: "หัวหอม", required: 1, unit: "หัว", emoji: "🧅", matchKey: "หัวหอม" },
-      { name: "กระเทียม", required: 3, unit: "กลีบ", emoji: "🧄", matchKey: "กระเทียม" },
-      { name: "น้ำมันพืช", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมัน" },
-      { name: "น้ำปลา", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "น้ำปลา" },
+      {
+        name: "ผงกะหรี่",
+        required: 2,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "กะหรี่",
+      },
+      {
+        name: "หัวหอม",
+        required: 1,
+        unit: "หัว",
+        emoji: "🧅",
+        matchKey: "หัวหอม",
+      },
+      {
+        name: "กระเทียม",
+        required: 3,
+        unit: "กลีบ",
+        emoji: "🧄",
+        matchKey: "กระเทียม",
+      },
+      {
+        name: "น้ำมันพืช",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมัน",
+      },
+      {
+        name: "น้ำปลา",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "น้ำปลา",
+      },
     ],
     steps: [
       "ตั้งกระทะใส่น้ำมันพืช ผัดหัวหอมและกระเทียมจนหอม",
@@ -501,11 +1037,41 @@ const menus: MenuItem[] = [
     imageClass: "from-orange-100 to-lime-100",
     matchKeywords: ["แครอท"],
     ingredients: [
-      { name: "แครอท", required: 2, unit: "หัว", emoji: "🥕", matchKey: "แครอท" },
-      { name: "น้ำมันมะกอก", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำมันมะกอก" },
-      { name: "น้ำส้มสายชู", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำส้ม" },
-      { name: "น้ำตาล", required: 1, unit: "ช้อนชา", emoji: "🧂", matchKey: "น้ำตาล" },
-      { name: "เกลือ", required: 0.5, unit: "ช้อนชา", emoji: "🧂", matchKey: "เกลือ" },
+      {
+        name: "แครอท",
+        required: 2,
+        unit: "หัว",
+        emoji: "🥕",
+        matchKey: "แครอท",
+      },
+      {
+        name: "น้ำมันมะกอก",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำมันมะกอก",
+      },
+      {
+        name: "น้ำส้มสายชู",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำส้ม",
+      },
+      {
+        name: "น้ำตาล",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "น้ำตาล",
+      },
+      {
+        name: "เกลือ",
+        required: 0.5,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "เกลือ",
+      },
     ],
     steps: [
       "ขูดแครอทเป็นเส้นหรือหั่นเป็นแว่นบาง",
@@ -526,9 +1092,27 @@ const menus: MenuItem[] = [
     imageClass: "from-orange-100 to-yellow-100",
     matchKeywords: ["แครอท"],
     ingredients: [
-      { name: "แครอท", required: 3, unit: "หัว", emoji: "🥕", matchKey: "แครอท" },
-      { name: "น้ำเปล่า", required: 200, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
-      { name: "น้ำผึ้ง", required: 1, unit: "ช้อนชา", emoji: "🍯", matchKey: "น้ำผึ้ง" },
+      {
+        name: "แครอท",
+        required: 3,
+        unit: "หัว",
+        emoji: "🥕",
+        matchKey: "แครอท",
+      },
+      {
+        name: "น้ำเปล่า",
+        required: 200,
+        unit: "มล.",
+        emoji: "💧",
+        matchKey: "น้ำ",
+      },
+      {
+        name: "น้ำผึ้ง",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🍯",
+        matchKey: "น้ำผึ้ง",
+      },
     ],
     steps: [
       "ปอกเปลือกแครอทและหั่นชิ้น",
@@ -549,11 +1133,41 @@ const menus: MenuItem[] = [
     imageClass: "from-pink-100 to-purple-100",
     matchKeywords: ["โยเกิร์ต", "น้ำผึ้ง"],
     ingredients: [
-      { name: "โยเกิร์ตธรรมชาติ", required: 200, unit: "กรัม", emoji: "🫙", matchKey: "โยเกิร์ต" },
-      { name: "กราโนลา", required: 4, unit: "ช้อนโต๊ะ", emoji: "🌾", matchKey: "กราโนลา" },
-      { name: "สตรอว์เบอร์รี่", required: 5, unit: "ลูก", emoji: "🍓", matchKey: "ผลไม้" },
-      { name: "น้ำผึ้ง", required: 1, unit: "ช้อนชา", emoji: "🍯", matchKey: "น้ำผึ้ง" },
-      { name: "บลูเบอร์รี่", required: 10, unit: "เม็ด", emoji: "🫐", matchKey: "ผลไม้" },
+      {
+        name: "โยเกิร์ตธรรมชาติ",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🫙",
+        matchKey: "โยเกิร์ต",
+      },
+      {
+        name: "กราโนลา",
+        required: 4,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🌾",
+        matchKey: "กราโนลา",
+      },
+      {
+        name: "สตรอว์เบอร์รี่",
+        required: 5,
+        unit: "ลูก",
+        emoji: "🍓",
+        matchKey: "ผลไม้",
+      },
+      {
+        name: "น้ำผึ้ง",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🍯",
+        matchKey: "น้ำผึ้ง",
+      },
+      {
+        name: "บลูเบอร์รี่",
+        required: 10,
+        unit: "เม็ด",
+        emoji: "🫐",
+        matchKey: "ผลไม้",
+      },
     ],
     steps: [
       "ตักโยเกิร์ตใส่แก้วหรือชาม",
@@ -574,10 +1188,34 @@ const menus: MenuItem[] = [
     imageClass: "from-blue-100 to-purple-100",
     matchKeywords: ["โยเกิร์ต", "น้ำตาล"],
     ingredients: [
-      { name: "โยเกิร์ตธรรมชาติ", required: 200, unit: "กรัม", emoji: "🫙", matchKey: "โยเกิร์ต" },
-      { name: "น้ำเย็น", required: 150, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
-      { name: "น้ำตาล", required: 2, unit: "ช้อนชา", emoji: "🧂", matchKey: "น้ำตาล" },
-      { name: "น้ำแข็ง", required: 1, unit: "ถ้วย", emoji: "🧊", matchKey: "น้ำแข็ง" },
+      {
+        name: "โยเกิร์ตธรรมชาติ",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🫙",
+        matchKey: "โยเกิร์ต",
+      },
+      {
+        name: "น้ำเย็น",
+        required: 150,
+        unit: "มล.",
+        emoji: "💧",
+        matchKey: "น้ำ",
+      },
+      {
+        name: "น้ำตาล",
+        required: 2,
+        unit: "ช้อนชา",
+        emoji: "🧂",
+        matchKey: "น้ำตาล",
+      },
+      {
+        name: "น้ำแข็ง",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🧊",
+        matchKey: "น้ำแข็ง",
+      },
     ],
     steps: [
       "ปั่นโยเกิร์ต น้ำ และน้ำตาลเข้าด้วยกัน",
@@ -598,11 +1236,35 @@ const menus: MenuItem[] = [
     imageClass: "from-yellow-100 to-green-100",
     matchKeywords: ["โยเกิร์ต", "กล้วย", "นม"],
     ingredients: [
-      { name: "โยเกิร์ตธรรมชาติ", required: 150, unit: "กรัม", emoji: "🫙", matchKey: "โยเกิร์ต" },
-      { name: "กล้วย", required: 1, unit: "ลูก", emoji: "🍌", matchKey: "กล้วย" },
+      {
+        name: "โยเกิร์ตธรรมชาติ",
+        required: 150,
+        unit: "กรัม",
+        emoji: "🫙",
+        matchKey: "โยเกิร์ต",
+      },
+      {
+        name: "กล้วย",
+        required: 1,
+        unit: "ลูก",
+        emoji: "🍌",
+        matchKey: "กล้วย",
+      },
       { name: "นมสด", required: 100, unit: "มล.", emoji: "🥛", matchKey: "นม" },
-      { name: "น้ำผึ้ง", required: 1, unit: "ช้อนชา", emoji: "🍯", matchKey: "น้ำผึ้ง" },
-      { name: "น้ำแข็ง", required: 0.5, unit: "ถ้วย", emoji: "🧊", matchKey: "น้ำแข็ง" },
+      {
+        name: "น้ำผึ้ง",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🍯",
+        matchKey: "น้ำผึ้ง",
+      },
+      {
+        name: "น้ำแข็ง",
+        required: 0.5,
+        unit: "ถ้วย",
+        emoji: "🧊",
+        matchKey: "น้ำแข็ง",
+      },
     ],
     steps: [
       "ใส่โยเกิร์ต กล้วย และนมลงในเครื่องปั่น",
@@ -623,11 +1285,35 @@ const menus: MenuItem[] = [
     imageClass: "from-red-100 to-orange-100",
     matchKeywords: ["ไก่", "ไข่"],
     ingredients: [
-      { name: "มาม่า", required: 1, unit: "ซอง", emoji: "🍜", matchKey: "มาม่า" },
-      { name: "ไก่สับ", required: 100, unit: "กรัม", emoji: "🍗", matchKey: "ไก่" },
+      {
+        name: "มาม่า",
+        required: 1,
+        unit: "ซอง",
+        emoji: "🍜",
+        matchKey: "มาม่า",
+      },
+      {
+        name: "ไก่สับ",
+        required: 100,
+        unit: "กรัม",
+        emoji: "🍗",
+        matchKey: "ไก่",
+      },
       { name: "น้ำ", required: 400, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
-      { name: "ไข่ไก่", required: 1, unit: "ฟอง", emoji: "🥚", matchKey: "ไข่" },
-      { name: "ต้นหอม", required: 1, unit: "ต้น", emoji: "🌱", matchKey: "ต้นหอม" },
+      {
+        name: "ไข่ไก่",
+        required: 1,
+        unit: "ฟอง",
+        emoji: "🥚",
+        matchKey: "ไข่",
+      },
+      {
+        name: "ต้นหอม",
+        required: 1,
+        unit: "ต้น",
+        emoji: "🌱",
+        matchKey: "ต้นหอม",
+      },
     ],
     steps: [
       "ต้มน้ำให้เดือด ใส่ไก่สับลงไปก่อน",
@@ -649,13 +1335,55 @@ const menus: MenuItem[] = [
     imageClass: "from-purple-100 to-pink-100",
     matchKeywords: ["หมู", "พริก"],
     ingredients: [
-      { name: "มะเขือยาว", required: 2, unit: "ลูก", emoji: "🍆", matchKey: "มะเขือ" },
-      { name: "หมูสับ", required: 100, unit: "กรัม", emoji: "🥩", matchKey: "หมู" },
-      { name: "หอมแดง", required: 2, unit: "หัว", emoji: "🧅", matchKey: "หอมแดง" },
-      { name: "พริกขี้หนู", required: 3, unit: "เม็ด", emoji: "🌶️", matchKey: "พริก" },
-      { name: "น้ำปลา", required: 1, unit: "ช้อนโต๊ะ", emoji: "🫙", matchKey: "น้ำปลา" },
-      { name: "น้ำมะนาว", required: 1, unit: "ช้อนโต๊ะ", emoji: "🍋", matchKey: "มะนาว" },
-      { name: "น้ำมันพืช", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "น้ำมัน" },
+      {
+        name: "มะเขือยาว",
+        required: 2,
+        unit: "ลูก",
+        emoji: "🍆",
+        matchKey: "มะเขือ",
+      },
+      {
+        name: "หมูสับ",
+        required: 100,
+        unit: "กรัม",
+        emoji: "🥩",
+        matchKey: "หมู",
+      },
+      {
+        name: "หอมแดง",
+        required: 2,
+        unit: "หัว",
+        emoji: "🧅",
+        matchKey: "หอมแดง",
+      },
+      {
+        name: "พริกขี้หนู",
+        required: 3,
+        unit: "เม็ด",
+        emoji: "🌶️",
+        matchKey: "พริก",
+      },
+      {
+        name: "น้ำปลา",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำปลา",
+      },
+      {
+        name: "น้ำมะนาว",
+        required: 1,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🍋",
+        matchKey: "มะนาว",
+      },
+      {
+        name: "น้ำมันพืช",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "น้ำมัน",
+      },
     ],
     steps: [
       "ย่างหรืออบมะเขือทั้งลูกจนสุกดำ ปอกเปลือก ฉีกเป็นเส้น",
@@ -677,11 +1405,41 @@ const menus: MenuItem[] = [
     imageClass: "from-slate-100 to-sky-100",
     matchKeywords: ["ไก่", "ผักกาด", "ต้นหอม"],
     ingredients: [
-      { name: "ไก่สับ", required: 200, unit: "กรัม", emoji: "🍗", matchKey: "ไก่" },
-      { name: "ผักกาดขาว", required: 1, unit: "ถ้วย", emoji: "🥬", matchKey: "ผักกาด" },
-      { name: "ต้นหอม", required: 2, unit: "ต้น", emoji: "🌱", matchKey: "ต้นหอม" },
-      { name: "ซีอิ๊วขาว", required: 1, unit: "ช้อนชา", emoji: "🫙", matchKey: "ซีอิ๊ว" },
-      { name: "น้ำซุป", required: 500, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
+      {
+        name: "ไก่สับ",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🍗",
+        matchKey: "ไก่",
+      },
+      {
+        name: "ผักกาดขาว",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🥬",
+        matchKey: "ผักกาด",
+      },
+      {
+        name: "ต้นหอม",
+        required: 2,
+        unit: "ต้น",
+        emoji: "🌱",
+        matchKey: "ต้นหอม",
+      },
+      {
+        name: "ซีอิ๊วขาว",
+        required: 1,
+        unit: "ช้อนชา",
+        emoji: "🫙",
+        matchKey: "ซีอิ๊ว",
+      },
+      {
+        name: "น้ำซุป",
+        required: 500,
+        unit: "มล.",
+        emoji: "💧",
+        matchKey: "น้ำ",
+      },
     ],
     steps: [
       "ต้มน้ำซุปให้เดือด ปั้นไก่สับเป็นลูกเล็กๆ ใส่หม้อ",
@@ -703,9 +1461,15 @@ export default function MenuRecommendationsPage() {
     try {
       const merged = new Set<string>();
       const a = localStorage.getItem(LIKED_MENUS_KEY);
-      if (a) { const p = JSON.parse(a); if (Array.isArray(p)) p.forEach((id: string) => merged.add(id)); }
+      if (a) {
+        const p = JSON.parse(a);
+        if (Array.isArray(p)) p.forEach((id: string) => merged.add(id));
+      }
       const b = localStorage.getItem("liked_expiring_menus");
-      if (b) { const p = JSON.parse(b); if (Array.isArray(p)) p.forEach((id: string) => merged.add(id)); }
+      if (b) {
+        const p = JSON.parse(b);
+        if (Array.isArray(p)) p.forEach((id: string) => merged.add(id));
+      }
       if (merged.size > 0) setLikedMenus(merged);
     } catch {}
   }, []);
@@ -775,7 +1539,9 @@ export default function MenuRecommendationsPage() {
         const aLiked = likedMenus.has(a.id) ? 1 : 0;
         const bLiked = likedMenus.has(b.id) ? 1 : 0;
         if (bLiked !== aLiked) return bLiked - aLiked;
-        return b.matchPercent - a.matchPercent || b.matchedCount - a.matchedCount;
+        return (
+          b.matchPercent - a.matchPercent || b.matchedCount - a.matchedCount
+        );
       });
   }, [pantryItems, likedMenus]);
 
@@ -839,7 +1605,10 @@ export default function MenuRecommendationsPage() {
                 aria-label="favorite-menu"
                 title="เมนูโปรด"
               >
-                <Heart className="h-4 w-4" fill={likedMenus.has(menu.id) ? "currentColor" : "none"} />
+                <Heart
+                  className="h-4 w-4"
+                  fill={likedMenus.has(menu.id) ? "currentColor" : "none"}
+                />
               </button>
             </div>
             <h2 className="mt-3 text-lg font-semibold text-slate-900">
@@ -875,6 +1644,7 @@ export default function MenuRecommendationsPage() {
                 className={`h-16 w-16 shrink-0 rounded-xl bg-gradient-to-br ${selectedMenu.imageClass} flex items-center justify-center overflow-hidden`}
               >
                 {selectedMenu.recipeImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={selectedMenu.recipeImage}
                     alt={selectedMenu.name}
@@ -950,7 +1720,12 @@ export default function MenuRecommendationsPage() {
                   className={`flex h-9 w-9 items-center justify-center rounded-full border transition ${likedMenus.has(selectedMenu.id) ? "border-red-200 bg-red-50 text-red-500" : "border-slate-200 bg-white text-slate-500 hover:bg-slate-100"}`}
                   aria-label="favorite-menu-dialog"
                 >
-                  <Heart className="h-4 w-4" fill={likedMenus.has(selectedMenu.id) ? "currentColor" : "none"} />
+                  <Heart
+                    className="h-4 w-4"
+                    fill={
+                      likedMenus.has(selectedMenu.id) ? "currentColor" : "none"
+                    }
+                  />
                 </button>
                 <button
                   type="button"
@@ -1084,6 +1859,7 @@ export default function MenuRecommendationsPage() {
                   {/* Recipe image / emoji hero */}
                   {selectedMenu.recipeImage ? (
                     <div className="h-44 w-full overflow-hidden bg-slate-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={selectedMenu.recipeImage}
                         alt={selectedMenu.name}
@@ -1091,8 +1867,12 @@ export default function MenuRecommendationsPage() {
                       />
                     </div>
                   ) : (
-                    <div className={`h-44 w-full flex items-center justify-center bg-gradient-to-br ${selectedMenu.imageClass}`}>
-                      <span className="text-7xl drop-shadow">{selectedMenu.emoji}</span>
+                    <div
+                      className={`h-44 w-full flex items-center justify-center bg-gradient-to-br ${selectedMenu.imageClass}`}
+                    >
+                      <span className="text-7xl drop-shadow">
+                        {selectedMenu.emoji}
+                      </span>
                     </div>
                   )}
                   <div className="px-4 py-4">

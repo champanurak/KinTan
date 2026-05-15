@@ -400,7 +400,7 @@ export default function PartnersPage() {
             <h3 className="mb-3 text-base font-bold text-slate-900">วิธีใช้และสิทธิประโยชน์</h3>
             <ul className="space-y-2 text-sm text-slate-600">
               <li className="flex gap-2"><span className="text-emerald-500">✓</span>เลือกฟิลเตอร์เพื่อดูร้านค้าตามประเภทที่ต้องการ</li>
-              <li className="flex gap-2"><span className="text-emerald-500">✓</span>กด "ไปที่ร้านค้า" เพื่อเปิดเว็บไซต์และรับโปรโมชั่น</li>
+              <li className="flex gap-2"><span className="text-emerald-500">✓</span>กด &ldquo;ไปที่ร้านค้า&rdquo; เพื่อเปิดเว็บไซต์และรับโปรโมชั่น</li>
               <li className="flex gap-2"><span className="text-emerald-500">✓</span>โปรโมชั่นมีวันหมดอายุ ควรใช้ก่อนวันที่ระบุ</li>
               <li className="flex gap-2"><span className="text-emerald-500">✓</span>ค่าจัดส่งฟรีเมื่อสั่งถึงขั้นต่ำที่กำหนด</li>
             </ul>
