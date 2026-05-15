@@ -2,101 +2,417 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import {
+  Info, ShoppingBasket, Building2, Store, Globe, MapPin,
+  ChevronDown, Truck, Navigation,
+} from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
 
-const partners = [
+type CategoryFilter = "all" | "supermarket" | "convenience" | "online" | "nearme";
+type SortOption = "recommended" | "nearest" | "discount";
+
+interface PromoInfo {
+  title: string;
+  subtitle: string;
+  note?: string;
+  expiry: string;
+  bgClass: string;
+  titleColor: string;
+  subtitleColor: string;
+  imageEmojis: string[]; // hex codes for /promos/emoji/{hex}.svg
+}
+
+interface Partner {
+  id: string;
+  name: string;
+  logoUrl: string;
+  fallbackInitial: string;
+  fallbackClass: string;
+  category: "supermarket" | "convenience" | "online";
+  categoryLabel: string;
+  websiteUrl: string;
+  promo: PromoInfo;
+  deliveryMin: number;
+  distance: number;
+}
+
+const FILTERS: { value: CategoryFilter; label: string; icon: React.ReactNode }[] = [
+  { value: "all",          label: "ทั้งหมด",           icon: <ShoppingBasket className="h-3.5 w-3.5" /> },
+  { value: "supermarket",  label: "ซุปเปอร์มาร์เก็ต", icon: <Building2 className="h-3.5 w-3.5" /> },
+  { value: "convenience",  label: "ร้านสะดวกซื้อ",    icon: <Store className="h-3.5 w-3.5" /> },
+  { value: "online",       label: "ออนไลน์",           icon: <Globe className="h-3.5 w-3.5" /> },
+  { value: "nearme",       label: "ใกล้ฉัน",           icon: <MapPin className="h-3.5 w-3.5" /> },
+];
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: "recommended", label: "แนะนำ" },
+  { value: "nearest",     label: "ใกล้ฉัน" },
+  { value: "discount",    label: "ส่วนลดมากที่สุด" },
+];
+
+const partners: Partner[] = [
   {
+    id: "lotuss",
     name: "Lotus's",
-    short: "LT",
-    logoUrl: "/partners/lotuss.png",
+    logoUrl: "/partners/lotuss-icon.svg",
+    fallbackInitial: "L",
+    fallbackClass: "bg-emerald-100 text-emerald-700",
+    category: "supermarket",
+    categoryLabel: "ซุปเปอร์มาร์เก็ต",
     websiteUrl: "https://www.lotuss.com",
-    logoClass: "bg-emerald-100 text-emerald-700 ring-emerald-200",
+    promo: {
+      title: "ลดสูงสุด 20%",
+      subtitle: "เมื่อซื้อผักและผลไม้ครบ 300 บาท",
+      expiry: "วันนี้ - 30 มิ.ย. 2567",
+      bgClass: "bg-gradient-to-br from-emerald-400 to-green-500",
+      titleColor: "text-white",
+      subtitleColor: "text-emerald-50",
+      imageEmojis: ["1f96c", "1f955", "1f345"],  // 🥬 🥕 🍅
+    },
+    deliveryMin: 699,
+    distance: 1.2,
   },
   {
+    id: "bigc",
     name: "Big C",
-    short: "BC",
-    logoUrl: "/partners/bigc.png",
+    logoUrl: "/partners/bigc-icon.svg",
+    fallbackInitial: "B",
+    fallbackClass: "bg-amber-100 text-amber-700",
+    category: "supermarket",
+    categoryLabel: "ซุปเปอร์มาร์เก็ต",
     websiteUrl: "https://www.bigc.co.th",
-    logoClass: "bg-red-100 text-red-700 ring-red-200",
+    promo: {
+      title: "ซื้อ 1 แถม 1",
+      subtitle: "สินค้าราคาพิเศษที่ร่วมรายการ",
+      expiry: "วันนี้ - 25 มิ.ย. 2567",
+      bgClass: "bg-gradient-to-br from-amber-200 to-yellow-300",
+      titleColor: "text-amber-900",
+      subtitleColor: "text-amber-800",
+      imageEmojis: ["1f95c", "1f37f", "1f36a"],  // 🥜 🍿 🍪
+    },
+    deliveryMin: 599,
+    distance: 2.5,
   },
   {
+    id: "tops",
     name: "Tops",
-    short: "TP",
     logoUrl: "/partners/tops.png",
+    fallbackInitial: "T",
+    fallbackClass: "bg-red-100 text-red-700",
+    category: "supermarket",
+    categoryLabel: "ซุปเปอร์มาร์เก็ต",
     websiteUrl: "https://www.tops.co.th",
-    logoClass: "bg-blue-100 text-blue-700 ring-blue-200",
+    promo: {
+      title: "ลด 150 บาท",
+      subtitle: "เมื่อซื้อครบ 1,500 บาท",
+      note: "*เฉพาะสินค้าที่ร่วมรายการ",
+      expiry: "วันนี้ - 15 ก.ค. 2567",
+      bgClass: "bg-gradient-to-br from-rose-100 to-pink-200",
+      titleColor: "text-rose-700",
+      subtitleColor: "text-rose-600",
+      imageEmojis: ["1f969", "1f357", "1f966"],  // 🥩 🍗 🥦
+    },
+    deliveryMin: 1000,
+    distance: 3.1,
   },
   {
+    id: "makro",
     name: "Makro",
-    short: "MK",
     logoUrl: "/partners/makro.ico",
+    fallbackInitial: "M",
+    fallbackClass: "bg-sky-100 text-sky-700",
+    category: "supermarket",
+    categoryLabel: "ซุปเปอร์มาร์เก็ต",
     websiteUrl: "https://www.siammakro.co.th",
-    logoClass: "bg-sky-100 text-sky-700 ring-sky-200",
+    promo: {
+      title: "ลดเพิ่ม 5%",
+      subtitle: "สำหรับสมาชิกเอ็มโคร",
+      expiry: "วันนี้ - 30 มิ.ย. 2567",
+      bgClass: "bg-gradient-to-br from-pink-100 to-rose-200",
+      titleColor: "text-red-600",
+      subtitleColor: "text-red-500",
+      imageEmojis: ["1f6d2", "1f96b", "1f955"],  // 🛒 🥫 🥕
+    },
+    deliveryMin: 1500,
+    distance: 6.3,
   },
   {
+    id: "cjmore",
     name: "CJ More",
-    short: "CJ",
     logoUrl: "/partners/cjmore.png",
+    fallbackInitial: "CJ",
+    fallbackClass: "bg-orange-100 text-orange-700",
+    category: "convenience",
+    categoryLabel: "ร้านสะดวกซื้อ",
     websiteUrl: "https://www.cjexpress.co.th",
-    logoClass: "bg-amber-100 text-amber-700 ring-amber-200",
+    promo: {
+      title: "ซื้อครบ 200 บาท",
+      subtitle: "รับคูปองส่วนลด 20 บาท",
+      expiry: "วันนี้ - 30 มิ.ย. 2567",
+      bgClass: "bg-gradient-to-br from-teal-300 to-emerald-500",
+      titleColor: "text-white",
+      subtitleColor: "text-teal-50",
+      imageEmojis: ["1f9c3", "1f964", "1f95b"],  // 🧃 🥤 🥛
+    },
+    deliveryMin: 200,
+    distance: 0.8,
   },
   {
+    id: "7eleven",
     name: "7-Eleven",
-    short: "7E",
     logoUrl: "/partners/7eleven.png",
+    fallbackInitial: "7E",
+    fallbackClass: "bg-lime-100 text-lime-700",
+    category: "convenience",
+    categoryLabel: "ร้านสะดวกซื้อ",
     websiteUrl: "https://www.7eleven.co.th",
-    logoClass: "bg-lime-100 text-lime-700 ring-lime-200",
+    promo: {
+      title: "ลด 10 บาท",
+      subtitle: "เมื่อซื้อครบ 100 บาท",
+      expiry: "วันนี้ - 30 มิ.ย. 2567",
+      bgClass: "bg-gradient-to-br from-sky-200 to-blue-300",
+      titleColor: "text-blue-900",
+      subtitleColor: "text-blue-800",
+      imageEmojis: ["1f371", "1f95b", "1f9c3"],  // 🍱 🥛 🧃
+    },
+    deliveryMin: 150,
+    distance: 0.5,
   },
 ];
 
 export default function PartnersPage() {
-  const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
-  const brokenSet = useMemo(() => brokenLogos, [brokenLogos]);
+  const [activeFilter, setActiveFilter] = useState<CategoryFilter>("all");
+  const [sortOption, setSortOption]     = useState<SortOption>("recommended");
+  const [sortOpen, setSortOpen]         = useState(false);
+  const [brokenLogos, setBrokenLogos]   = useState<Set<string>>(new Set());
+  const [infoOpen, setInfoOpen]         = useState(false);
+
+  const filtered = useMemo(() => {
+    let list = [...partners];
+    if (activeFilter === "nearme") {
+      list = list.sort((a, b) => a.distance - b.distance);
+    } else if (activeFilter !== "all") {
+      list = list.filter((p) => p.category === activeFilter);
+    }
+    if (sortOption === "nearest") list = [...list].sort((a, b) => a.distance - b.distance);
+    return list;
+  }, [activeFilter, sortOption]);
+
+  const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortOption)?.label ?? "แนะนำ";
 
   return (
-    <AppShell title="ร้านค้าพาร์ทเนอร์" subtitle="ค้นหาร้านค้าและโปรโมชั่นที่เชื่อมกับ Kin-Tan">
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {partners.map((shop) => (
-          <article key={shop.name} className="rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {brokenSet[shop.name] ? (
-                  <span className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold ring-1 ${shop.logoClass}`}>
-                    {shop.short}
-                  </span>
-                ) : (
-                  <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
-                    <Image
-                      src={shop.logoUrl}
-                      alt={`${shop.name} logo`}
-                      width={28}
-                      height={28}
-                      className="h-7 w-7 object-contain"
-                      onError={() =>
-                        setBrokenLogos((prev) => ({
-                          ...prev,
-                          [shop.name]: true,
-                        }))
-                      }
-                    />
-                  </span>
-                )}
-                <h2 className="text-lg font-semibold text-slate-900">{shop.name}</h2>
-              </div>
-              <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs text-emerald-700">พาร์ทเนอร์</span>
-            </div>
-            <p className="mt-2 text-sm text-slate-500">โปรโมชันวัตถุดิบที่ใช้บ่อยอัปเดตทุกวัน</p>
-            <a
-              href={shop.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white hover:bg-black"
+    <AppShell
+      title="ร้านค้าพาร์ทเนอร์"
+      subtitle="ค้นหาร้านค้าและโปรโมชั่นที่เชื่อมกับ Kin-Tan"
+      headerAction={
+        <button
+          onClick={() => setInfoOpen(true)}
+          className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100"
+        >
+          <Info className="h-3.5 w-3.5" />
+          วิธีใช้และสิทธิประโยชน์
+        </button>
+      }
+    >
+
+      {/* Top row: filters + sort */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Filter tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setActiveFilter(f.value)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                activeFilter === f.value
+                  ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+              }`}
             >
-              ดูรายละเอียด
-            </a>
-          </article>
-        ))}
-      </section>
+              {f.icon}
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Right: sort only */}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="relative">
+            <button
+              onClick={() => setSortOpen((p) => !p)}
+              className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              เรียงตาม: {currentSortLabel}
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
+            </button>
+            {sortOpen && (
+              <div className="absolute right-0 top-full z-20 mt-1 min-w-[140px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+                {SORT_OPTIONS.map((o) => (
+                  <button
+                    key={o.value}
+                    onClick={() => { setSortOption(o.value); setSortOpen(false); }}
+                    className={`w-full px-4 py-2 text-left text-xs transition hover:bg-slate-50 ${sortOption === o.value ? "font-semibold text-emerald-600" : "text-slate-700"}`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Partner grid */}
+      {filtered.length === 0 ? (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-12 text-center">
+          <p className="text-slate-400">ไม่พบร้านค้าในหมวดหมู่นี้</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((partner) => (
+            <article
+              key={partner.id}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+            >
+              {/* Card header */}
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    {brokenLogos.has(partner.id) ? (
+                      <span className={`flex h-full w-full items-center justify-center rounded-xl text-xs font-bold ${partner.fallbackClass}`}>
+                        {partner.fallbackInitial}
+                      </span>
+                    ) : (
+                      <Image
+                        src={partner.logoUrl}
+                        alt={partner.name}
+                        width={28}
+                        height={28}
+                        className="h-7 w-7 object-contain"
+                        onError={() => setBrokenLogos((prev) => new Set(prev).add(partner.id))}
+                      />
+                    )}
+                  </div>
+                  <span className="text-base font-bold text-slate-900">{partner.name}</span>
+                </div>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                  {partner.categoryLabel}
+                </span>
+              </div>
+
+              {/* Promo banner */}
+              <div className={`relative mx-3 mb-3 h-28 overflow-hidden rounded-xl ${partner.promo.bgClass}`}>
+                {/* Text */}
+                <div className="absolute inset-0 flex flex-col justify-center px-4 py-3" style={{ width: "60%" }}>
+                  <p className={`text-xl font-extrabold leading-tight ${partner.promo.titleColor}`}>
+                    {partner.promo.title}
+                  </p>
+                  <p className={`mt-0.5 text-[11px] leading-snug ${partner.promo.subtitleColor}`}>
+                    {partner.promo.subtitle}
+                  </p>
+                  {partner.promo.note && (
+                    <p className={`text-[10px] ${partner.promo.subtitleColor} opacity-80`}>
+                      {partner.promo.note}
+                    </p>
+                  )}
+                  <p className={`mt-1.5 text-[10px] font-medium ${partner.promo.subtitleColor} opacity-70`}>
+                    {partner.promo.expiry}
+                  </p>
+                </div>
+
+                {/* Emoji product collage */}
+                <div className="absolute right-0 top-0 h-full w-[44%] flex items-center justify-center overflow-hidden">
+                  <div className="relative flex items-center gap-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/promos/emoji/${partner.promo.imageEmojis[2]}.svg`} alt="" className="w-9 h-9 opacity-80" style={{ transform: "rotate(-6deg)" }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/promos/emoji/${partner.promo.imageEmojis[0]}.svg`} alt="" className="w-14 h-14" style={{ transform: "rotate(3deg)" }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/promos/emoji/${partner.promo.imageEmojis[1]}.svg`} alt="" className="w-10 h-10 opacity-90" style={{ transform: "rotate(6deg)" }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2 px-3 pb-3">
+                <a
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 rounded-xl border border-slate-200 py-2 text-center text-[12px] font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  ดูรายละเอียด
+                </a>
+                <a
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 rounded-xl bg-emerald-500 py-2 text-center text-[12px] font-semibold text-white transition hover:bg-emerald-600"
+                >
+                  ไปที่ร้านค้า
+                </a>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2">
+                <span className="flex items-center gap-1 text-[11px] text-slate-500">
+                  <Truck className="h-3 w-3 text-emerald-500" />
+                  จัดส่งฟรีเมื่อครบ {partner.deliveryMin.toLocaleString()} บาท
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-slate-500">
+                  <Navigation className="h-3 w-3 text-slate-400" />
+                  {partner.distance} กม.
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {/* Bottom banner */}
+      <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-green-50 p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="flex items-center gap-2 text-base font-bold text-emerald-800">
+              <span className="text-xl">🌿</span>
+              ประหยัด คุ้มค่า ไม่ทิ้งอาหาร
+            </p>
+            <p className="mt-1 max-w-sm text-xs text-emerald-700">
+              ใช้โปรโมชั่นอย่างชาญฉลาด ช่วยประหยัดค่าใช้จ่าย และลดการสูญเสียอาหารไปพร้อมกัน
+            </p>
+          </div>
+          <div className="hidden sm:block">
+            <Image
+              src="/illustrations/login-grocery.svg"
+              alt="grocery"
+              width={80}
+              height={80}
+              className="h-20 w-20 object-contain opacity-80"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Info modal */}
+      {infoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="mb-3 text-base font-bold text-slate-900">วิธีใช้และสิทธิประโยชน์</h3>
+            <ul className="space-y-2 text-sm text-slate-600">
+              <li className="flex gap-2"><span className="text-emerald-500">✓</span>เลือกฟิลเตอร์เพื่อดูร้านค้าตามประเภทที่ต้องการ</li>
+              <li className="flex gap-2"><span className="text-emerald-500">✓</span>กด "ไปที่ร้านค้า" เพื่อเปิดเว็บไซต์และรับโปรโมชั่น</li>
+              <li className="flex gap-2"><span className="text-emerald-500">✓</span>โปรโมชั่นมีวันหมดอายุ ควรใช้ก่อนวันที่ระบุ</li>
+              <li className="flex gap-2"><span className="text-emerald-500">✓</span>ค่าจัดส่งฟรีเมื่อสั่งถึงขั้นต่ำที่กำหนด</li>
+            </ul>
+            <button
+              onClick={() => setInfoOpen(false)}
+              className="mt-4 w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600"
+            >
+              รับทราบ
+            </button>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

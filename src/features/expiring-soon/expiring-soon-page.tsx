@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { X, Heart } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
 
@@ -13,6 +14,7 @@ interface Recipe {
   carbs: number;
   fat: number;
   time: number;
+  menuId?: string;
 }
 
 interface ExpiringItem {
@@ -31,35 +33,35 @@ interface RecipeGuide {
 
 const RECIPE_DB: Record<string, Recipe[]> = {
   "ไก่สด": [
-    { id: "r1", name: "ข้าวมันไก่", emoji: "🍚", calories: 520, protein: 35, carbs: 60, fat: 12, time: 45 },
-    { id: "r2", name: "ไก่ผัดกะเพรา", emoji: "🌿", calories: 380, protein: 30, carbs: 15, fat: 20, time: 20 },
-    { id: "r3", name: "ต้มข่าไก่", emoji: "🥥", calories: 310, protein: 28, carbs: 8, fat: 18, time: 30 },
-    { id: "r4", name: "ไก่ย่างซอสบาร์บีคิว", emoji: "🔥", calories: 420, protein: 38, carbs: 12, fat: 22, time: 35 },
+    { id: "r1", name: "ข้าวมันไก่", emoji: "🍚", calories: 520, protein: 35, carbs: 60, fat: 12, time: 45, menuId: "m5" },
+    { id: "r2", name: "ไก่ผัดกะเพรา", emoji: "🌿", calories: 380, protein: 30, carbs: 15, fat: 20, time: 20, menuId: "m1" },
+    { id: "r3", name: "ต้มข่าไก่", emoji: "🥥", calories: 310, protein: 28, carbs: 8, fat: 18, time: 30, menuId: "m6" },
+    { id: "r4", name: "ไก่ย่างซอสบาร์บีคิว", emoji: "🔥", calories: 420, protein: 38, carbs: 12, fat: 22, time: 35, menuId: "m7" },
   ],
   "นมสด": [
-    { id: "r5", name: "สมูทตี้ผลไม้", emoji: "🍓", calories: 220, protein: 8, carbs: 38, fat: 4, time: 10 },
-    { id: "r6", name: "โอวัลตินนม", emoji: "🥛", calories: 180, protein: 7, carbs: 30, fat: 5, time: 5 },
-    { id: "r7", name: "พุดดิ้งนม", emoji: "🍮", calories: 290, protein: 9, carbs: 45, fat: 8, time: 25 },
+    { id: "r5", name: "สมูทตี้ผลไม้", emoji: "🍓", calories: 220, protein: 8, carbs: 38, fat: 4, time: 10, menuId: "m8" },
+    { id: "r6", name: "โอวัลตินนม", emoji: "🥛", calories: 180, protein: 7, carbs: 30, fat: 5, time: 5, menuId: "m9" },
+    { id: "r7", name: "พุดดิ้งนม", emoji: "🍮", calories: 290, protein: 9, carbs: 45, fat: 8, time: 25, menuId: "m10" },
   ],
   "เห็ดหอม": [
-    { id: "r8", name: "เห็ดผัดน้ำมันหอย", emoji: "🍄", calories: 180, protein: 6, carbs: 12, fat: 10, time: 15 },
-    { id: "r9", name: "ต้มยำเห็ด", emoji: "🍲", calories: 150, protein: 8, carbs: 10, fat: 6, time: 20 },
-    { id: "r10", name: "ข้าวผัดเห็ด", emoji: "🍳", calories: 420, protein: 12, carbs: 65, fat: 14, time: 20 },
+    { id: "r8", name: "เห็ดผัดน้ำมันหอย", emoji: "🍄", calories: 180, protein: 6, carbs: 12, fat: 10, time: 15, menuId: "m11" },
+    { id: "r9", name: "ต้มยำเห็ด", emoji: "🍲", calories: 150, protein: 8, carbs: 10, fat: 6, time: 20, menuId: "m12" },
+    { id: "r10", name: "ข้าวผัดเห็ด", emoji: "🍳", calories: 420, protein: 12, carbs: 65, fat: 14, time: 20, menuId: "m3" },
   ],
   "เต้าหู้": [
-    { id: "r11", name: "แกงจืดเต้าหู้", emoji: "🥣", calories: 190, protein: 14, carbs: 8, fat: 9, time: 25 },
-    { id: "r12", name: "เต้าหู้ทอดกระเทียม", emoji: "🧄", calories: 280, protein: 16, carbs: 10, fat: 18, time: 20 },
-    { id: "r13", name: "ต้มยำเต้าหู้", emoji: "🌶️", calories: 160, protein: 12, carbs: 7, fat: 8, time: 20 },
+    { id: "r11", name: "แกงจืดเต้าหู้", emoji: "🥣", calories: 190, protein: 14, carbs: 8, fat: 9, time: 25, menuId: "m4" },
+    { id: "r12", name: "เต้าหู้ทอดกระเทียม", emoji: "🧄", calories: 280, protein: 16, carbs: 10, fat: 18, time: 20, menuId: "m13" },
+    { id: "r13", name: "ต้มยำเต้าหู้", emoji: "🌶️", calories: 160, protein: 12, carbs: 7, fat: 8, time: 20, menuId: "m14" },
   ],
   "แครอท": [
-    { id: "r14", name: "แกงแครอท", emoji: "🥕", calories: 210, protein: 5, carbs: 28, fat: 9, time: 30 },
-    { id: "r15", name: "สลัดแครอท", emoji: "🥗", calories: 120, protein: 3, carbs: 18, fat: 4, time: 10 },
-    { id: "r16", name: "น้ำแครอทปั่น", emoji: "🥤", calories: 95, protein: 2, carbs: 20, fat: 0, time: 5 },
+    { id: "r14", name: "แกงแครอต", emoji: "🥕", calories: 210, protein: 5, carbs: 28, fat: 9, time: 30, menuId: "m15" },
+    { id: "r15", name: "สลัดแครอต", emoji: "🥗", calories: 120, protein: 3, carbs: 18, fat: 4, time: 10, menuId: "m16" },
+    { id: "r16", name: "น้ำแครอตปั่น", emoji: "🥤", calories: 95, protein: 2, carbs: 20, fat: 0, time: 5, menuId: "m17" },
   ],
   "โยเกิร์ต": [
-    { id: "r17", name: "พาร์เฟ่ต์โยเกิร์ต", emoji: "🫙", calories: 260, protein: 12, carbs: 38, fat: 6, time: 10 },
-    { id: "r18", name: "ลาซีโยเกิร์ต", emoji: "🥛", calories: 170, protein: 8, carbs: 22, fat: 5, time: 5 },
-    { id: "r19", name: "สมูทตี้โยเกิร์ต", emoji: "🍌", calories: 240, protein: 10, carbs: 40, fat: 4, time: 8 },
+    { id: "r17", name: "พาร์เฟ่ต์โยเกิร์ต", emoji: "🧴", calories: 260, protein: 12, carbs: 38, fat: 6, time: 10, menuId: "m18" },
+    { id: "r18", name: "ลาซีโยเกิร์ต", emoji: "🥛", calories: 170, protein: 8, carbs: 22, fat: 5, time: 5, menuId: "m19" },
+    { id: "r19", name: "สมูทตี้โยเกดิร์ต", emoji: "🍌", calories: 240, protein: 10, carbs: 40, fat: 4, time: 8, menuId: "m20" },
   ],
 };
 
@@ -90,6 +92,7 @@ const RECIPE_GUIDE_DB: Record<string, RecipeGuide> = {
 const LIKED_KEY = "liked_recipes";
 
 export default function ExpiringSoonPage() {
+  const router = useRouter();
   const [selectedItem, setSelectedItem] = useState<ExpiringItem | null>(null);
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
@@ -102,7 +105,7 @@ export default function ExpiringSoonPage() {
     } catch {}
   }, []);
 
-  function toggleLike(id: string) {
+  function toggleLike(id: string, menuId?: string) {
     setLiked(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -111,6 +114,21 @@ export default function ExpiringSoonPage() {
         next.add(id);
       }
       localStorage.setItem(LIKED_KEY, JSON.stringify([...next]));
+
+      // sync to liked_expiring_menus for menu-recommendations ordering only
+      if (menuId) {
+        try {
+          const raw = localStorage.getItem("liked_expiring_menus");
+          const menuSet = new Set<string>(raw ? JSON.parse(raw) : []);
+          if (next.has(id)) {
+            menuSet.add(menuId);
+          } else {
+            menuSet.delete(menuId);
+          }
+          localStorage.setItem("liked_expiring_menus", JSON.stringify([...menuSet]));
+        } catch {}
+      }
+
       return next;
     });
   }
@@ -219,7 +237,7 @@ export default function ExpiringSoonPage() {
                         </div>
                       </div>
                       <button
-                        onClick={() => toggleLike(recipe.id)}
+                        onClick={() => toggleLike(recipe.id, recipe.menuId)}
                         className={`flex h-8 w-8 items-center justify-center rounded-full transition ${isLiked ? "bg-red-100 text-red-500 hover:bg-red-200" : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}
                       >
                         <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
@@ -271,11 +289,15 @@ export default function ExpiringSoonPage() {
               </button>
               <button
                 onClick={() => {
-                  if (cookingRecipe) {
-                    setGuideRecipe(cookingRecipe);
+                  if (cookingRecipe?.menuId) {
+                    setCookingRecipe(null);
+                    setSelectedItem(null);
+                    router.push(`/menu-recommendations?menu=${cookingRecipe.menuId}`);
+                  } else {
+                    if (cookingRecipe) setGuideRecipe(cookingRecipe);
+                    setCookingRecipe(null);
+                    setSelectedItem(null);
                   }
-                  setCookingRecipe(null);
-                  setSelectedItem(null);
                 }}
                 className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
               >

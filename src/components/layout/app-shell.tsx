@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 
 type NavItem = { href: string; label: string; icon: React.ReactNode };
-type AppShellProps = { title: string; subtitle?: string; children: React.ReactNode };
+type AppShellProps = { title: string; subtitle?: string; headerAction?: React.ReactNode; children: React.ReactNode };
 
 const navItems: NavItem[] = [
   { href: "/home",                label: "หน้าหลัก",          icon: <Home className="h-4 w-4" /> },
@@ -29,7 +29,7 @@ const PRIMARY_HREFS = ["/home", "/scan-receipt", "/pantry", "/expiring-soon", "/
 const bottomNavItems = navItems.filter((n) => PRIMARY_HREFS.includes(n.href));
 const moreNavItems   = navItems.filter((n) => !PRIMARY_HREFS.includes(n.href));
 
-export default function AppShell({ title, subtitle, children }: AppShellProps) {
+export default function AppShell({ title, subtitle, headerAction, children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -165,8 +165,13 @@ export default function AppShell({ title, subtitle, children }: AppShellProps) {
 
           {/* Page title */}
           <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3">
-            <h1 className="text-base font-semibold text-slate-900 sm:text-lg md:text-xl">{title}</h1>
-            {subtitle && <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">{subtitle}</p>}
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h1 className="text-base font-semibold text-slate-900 sm:text-lg md:text-xl">{title}</h1>
+                {subtitle && <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">{subtitle}</p>}
+              </div>
+              {headerAction && <div className="shrink-0">{headerAction}</div>}
+            </div>
           </div>
 
           <div className="space-y-4">{children}</div>

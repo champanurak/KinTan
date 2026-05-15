@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#8DC63F"/>
+  <!-- Large C shape in red -->
+  <path d="M160,40 C160,40 60,20 40,100 C20,180 120,190 160,170" fill="none" stroke="#CC1B1B" stroke-width="52" stroke-linecap="round"/>
+  <!-- "Big" text in yellow -->
+  <text x="52" y="82" font-family="Arial, sans-serif" font-size="46" font-weight="900" font-style="italic" fill="#FFE600" stroke="#CC1B1B" stroke-width="2">Big</text>
+  <!-- "C" hint inside -->
+</svg>

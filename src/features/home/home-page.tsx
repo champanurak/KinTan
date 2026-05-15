@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Camera, Package, TriangleAlert, Wallet, Leaf, Clock, Beef, Heart, ChevronRight, ChevronLeft, BrainCircuit, FileBarChart2 } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
@@ -86,6 +87,7 @@ const recommendedPurchases = [
 const recipes = [
   {
     name: "ผัดกะเพราไก่",
+    menuId: "m1",
     expiryUsage: 80,
     calories: "520 kcal",
     protein: "35g",
@@ -93,6 +95,7 @@ const recipes = [
   },
   {
     name: "สุกี้น้ำใส",
+    menuId: "m2",
     expiryUsage: 70,
     calories: "380 kcal",
     protein: "28g",
@@ -100,6 +103,7 @@ const recipes = [
   },
   {
     name: "มาม่าต้มยำไก่",
+    menuId: "m21",
     expiryUsage: 60,
     calories: "450 kcal",
     protein: "15g",
@@ -107,6 +111,7 @@ const recipes = [
   },
   {
     name: "ยำมะเขือ",
+    menuId: "m22",
     expiryUsage: 50,
     calories: "150 kcal",
     protein: "4g",
@@ -114,6 +119,7 @@ const recipes = [
   },
   {
     name: "ต้มจืดไก่สับ",
+    menuId: "m23",
     expiryUsage: 90,
     calories: "210 kcal",
     protein: "22g",
@@ -122,11 +128,32 @@ const recipes = [
 ];
 
 export default function HomeDashboardPage() {
+  const router = useRouter();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [likedRecipes, setLikedRecipes] = useState<Set<number>>(new Set());
+  const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(3);
-  const maxIndex = Math.max(0, recipes.length - visibleCount);
+
+  const sortedRecipes = useMemo(
+    () => [...recipes].sort((a, b) => {
+      const aL = likedRecipes.has(a.menuId) ? 1 : 0;
+      const bL = likedRecipes.has(b.menuId) ? 1 : 0;
+      return bL - aL;
+    }),
+    [likedRecipes],
+  );
+
+  const maxIndex = Math.max(0, sortedRecipes.length - visibleCount);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("liked_menu_recommendations");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setLikedRecipes(new Set<string>(parsed));
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const updateVisibleCount = () => {
@@ -151,10 +178,12 @@ export default function HomeDashboardPage() {
     setCarouselIndex((prev) => Math.min(prev, maxIndex));
   }, [maxIndex]);
 
-  function toggleLike(idx: number) {
+  function toggleLike(menuId: string) {
     setLikedRecipes((prev) => {
       const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      if (next.has(menuId)) next.delete(menuId); else next.add(menuId);
+      localStorage.setItem("liked_menu_recommendations", JSON.stringify([...next]));
+      setCarouselIndex(0);
       return next;
     });
   }
@@ -283,7 +312,7 @@ export default function HomeDashboardPage() {
                     transform: `translateX(calc(-${carouselIndex} * (((100% - ${(visibleCount - 1) * 12}px) / ${visibleCount}) + 12px)))`
                   }}
                 >
-                  {recipes.map((recipe, idx) => (
+                  {sortedRecipes.map((recipe, idx) => (
                     <div
                       key={idx}
                       className="shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white"
@@ -323,18 +352,19 @@ export default function HomeDashboardPage() {
                         <div className="mt-3 flex items-center justify-between gap-2">
                           <button
                             type="button"
+                            onClick={() => router.push(`/menu-recommendations?menu=${recipe.menuId}`)}
                             className="flex-1 rounded-lg border border-emerald-500 px-3 py-1.5 text-[11px] font-semibold text-emerald-600 transition hover:bg-emerald-50"
                           >
                             ทำเมนูนี้
                           </button>
                           <button
                             type="button"
-                            onClick={() => toggleLike(idx)}
+                            onClick={() => toggleLike(recipe.menuId)}
                             className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 transition hover:bg-slate-50"
                             aria-label="ถูกใจ"
                           >
                             <Heart
-                              className={`h-4 w-4 transition ${likedRecipes.has(idx) ? "fill-rose-500 stroke-rose-500" : "fill-none stroke-slate-400"}`}
+                              className={`h-4 w-4 transition ${likedRecipes.has(recipe.menuId) ? "fill-rose-500 stroke-rose-500" : "fill-none stroke-slate-400"}`}
                             />
                           </button>
                         </div>
