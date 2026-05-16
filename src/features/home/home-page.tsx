@@ -8,6 +8,7 @@ import { Camera, Package, TriangleAlert, Wallet, Leaf, Clock, Beef, Heart, Chevr
 import AppShell from "@/components/layout/app-shell";
 import Card, { StatCard } from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
+import { recordCook } from "@/lib/cook-stats";
 
 const quickStats = [
   {
@@ -88,14 +89,16 @@ const recipes = [
   {
     name: "ผัดกะเพราไก่",
     menuId: "m1",
+    emoji: "🌿",
     expiryUsage: 80,
     calories: "520 kcal",
     protein: "35g",
     photo: "/recipes/pad-krapao.svg"
   },
   {
-    name: "สุกี้น้ำใส",
+    name: "สุกี้หมูน้ำ",
     menuId: "m2",
+    emoji: "🍲",
     expiryUsage: 70,
     calories: "380 kcal",
     protein: "28g",
@@ -104,6 +107,7 @@ const recipes = [
   {
     name: "มาม่าต้มยำไก่",
     menuId: "m21",
+    emoji: "🍜",
     expiryUsage: 60,
     calories: "450 kcal",
     protein: "15g",
@@ -112,6 +116,7 @@ const recipes = [
   {
     name: "ยำมะเขือ",
     menuId: "m22",
+    emoji: "🍆",
     expiryUsage: 50,
     calories: "150 kcal",
     protein: "4g",
@@ -120,6 +125,7 @@ const recipes = [
   {
     name: "ต้มจืดไก่สับ",
     menuId: "m23",
+    emoji: "🍲",
     expiryUsage: 90,
     calories: "210 kcal",
     protein: "22g",
@@ -133,6 +139,7 @@ export default function HomeDashboardPage() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(3);
+  const [cookConfirmRecipe, setCookConfirmRecipe] = useState<typeof recipes[number] | null>(null);
 
   const sortedRecipes = useMemo(
     () => [...recipes].sort((a, b) => {
@@ -352,7 +359,7 @@ export default function HomeDashboardPage() {
                         <div className="mt-3 flex items-center justify-between gap-2">
                           <button
                             type="button"
-                            onClick={() => router.push(`/menu-recommendations?menu=${recipe.menuId}`)}
+                            onClick={() => setCookConfirmRecipe(recipe)}
                             className="flex-1 rounded-lg border border-emerald-500 px-3 py-1.5 text-[11px] font-semibold text-emerald-600 transition hover:bg-emerald-50"
                           >
                             ทำเมนูนี้
@@ -552,6 +559,38 @@ export default function HomeDashboardPage() {
           ))}
         </div>
       </div>
+
+      {cookConfirmRecipe && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-xs rounded-2xl bg-white p-6 shadow-2xl mx-4 text-center">
+            <span className="text-5xl block mb-3">{cookConfirmRecipe.emoji}</span>
+            <h3 className="text-lg font-semibold text-slate-900 mb-1">{cookConfirmRecipe.name}</h3>
+            <p className="text-sm text-slate-500 mb-5">เริ่มทำเมนูนี้เลยไหม?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setCookConfirmRecipe(null)}
+                className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+              >
+                ยังก่อน
+              </button>
+              <button
+                onClick={() => {
+                  recordCook(cookConfirmRecipe.menuId, {
+                    name: cookConfirmRecipe.name,
+                    emoji: cookConfirmRecipe.emoji,
+                    img: cookConfirmRecipe.photo,
+                  });
+                  setCookConfirmRecipe(null);
+                  router.push(`/menu-recommendations?menu=${cookConfirmRecipe.menuId}`);
+                }}
+                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
+              >
+                เริ่มทำเลย!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedItem ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" role="dialog" aria-modal="true" onClick={() => setSelectedItemId(null)}>

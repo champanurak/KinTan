@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Sarabun } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/providers/auth-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -21,9 +22,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="th">
+    <html lang="th" suppressHydrationWarning>
       <body className={`${spaceGrotesk.variable} ${sarabun.variable} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

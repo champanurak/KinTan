@@ -11,6 +11,7 @@ import {
   Plus,
 } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
+import { recordCook } from "@/lib/cook-stats";
 
 interface IngredientItem {
   name: string;
@@ -174,7 +175,7 @@ const menus: MenuItem[] = [
   },
   {
     id: "m2",
-    name: "สุกี้น้ำ",
+    name: "สุกี้หมูน้ำ",
     calories: 380,
     protein: 28,
     carbs: 26,
@@ -183,10 +184,10 @@ const menus: MenuItem[] = [
     emoji: "🍲",
     imageClass: "from-blue-100 to-cyan-100",
     recipeImage: "/recipes/suki-clear.svg",
-    matchKeywords: ["ผักกาด", "หมู", "ไก่", "วุ้นเส้น", "ไข่", "น้ำจิ้มสุกี้"],
+    matchKeywords: ["ผักกาด", "หมู", "วุ้นเส้น", "ไข่", "น้ำจิ้มสุกี้"],
     ingredients: [
       {
-        name: "น้ำซุปหมู/ไก่",
+        name: "น้ำซุปหมู",
         required: 600,
         unit: "มล.",
         emoji: "💧",
@@ -200,7 +201,7 @@ const menus: MenuItem[] = [
         matchKey: "ผักกาด",
       },
       {
-        name: "หมูหรือไก่",
+        name: "หมูสไลซ์",
         required: 200,
         unit: "กรัม",
         emoji: "🥩",
@@ -230,7 +231,7 @@ const menus: MenuItem[] = [
     ],
     steps: [
       "แช่วุ้นเส้นในน้ำเย็น 15 นาทีให้นุ่ม",
-      "ต้มน้ำซุป 600 มล. ให้เดือด ใส่เนื้อสัตว์จนสุก",
+      "ต้มน้ำซุป 600 มล. ให้เดือด ใส่หมูสไลซ์จนสุก",
       "เติมผักกาดและวุ้นเส้น ต้มต่อ 2 นาที",
       "ตอกไข่ รอไข่สุก ราดน้ำจิ้มสุกี้แล้วเสิร์ฟ",
     ],
@@ -1449,6 +1450,70 @@ const menus: MenuItem[] = [
     ],
     tip: "เพิ่มเต้าหู้ขาวได้เพื่อโปรตีนเพิ่มเติม",
   },
+  {
+    id: "m24",
+    name: "สุกี้ไก่น้ำ",
+    calories: 360,
+    protein: 30,
+    carbs: 26,
+    fat: 10,
+    prep: "20 นาที",
+    emoji: "🍲",
+    imageClass: "from-sky-100 to-cyan-100",
+    recipeImage: "/recipes/suki-clear.svg",
+    matchKeywords: ["ผักกาด", "ไก่", "วุ้นเส้น", "ไข่", "น้ำจิ้มสุกี้"],
+    ingredients: [
+      {
+        name: "น้ำซุปไก่",
+        required: 600,
+        unit: "มล.",
+        emoji: "💧",
+        matchKey: "น้ำ",
+      },
+      {
+        name: "ผักกาดขาว",
+        required: 1,
+        unit: "ถ้วย",
+        emoji: "🥬",
+        matchKey: "ผักกาด",
+      },
+      {
+        name: "อกไก่สไลซ์",
+        required: 200,
+        unit: "กรัม",
+        emoji: "🍗",
+        matchKey: "ไก่",
+      },
+      {
+        name: "วุ้นเส้น (แช่น้ำแล้ว)",
+        required: 1,
+        unit: "กำ",
+        emoji: "🍜",
+        matchKey: "วุ้นเส้น",
+      },
+      {
+        name: "ไข่ไก่",
+        required: 1,
+        unit: "ฟอง",
+        emoji: "🥚",
+        matchKey: "ไข่",
+      },
+      {
+        name: "น้ำจิ้มสุกี้",
+        required: 2,
+        unit: "ช้อนโต๊ะ",
+        emoji: "🫙",
+        matchKey: "น้ำจิ้มสุกี้",
+      },
+    ],
+    steps: [
+      "แช่วุ้นเส้นในน้ำเย็น 15 นาทีให้นุ่ม",
+      "ต้มน้ำซุปไก่ 600 มล. ให้เดือด ใส่อกไก่สไลซ์จนสุก",
+      "เติมผักกาดและวุ้นเส้น ต้มต่อ 2 นาที",
+      "ตอกไข่ รอไข่สุก ราดน้ำจิ้มสุกี้แล้วเสิร์ฟ",
+    ],
+    tip: "เพิ่มเต้าหู้หรือเห็ดเพื่อเพิ่มคุณค่าทางโภชนาการ",
+  },
 ];
 
 export default function MenuRecommendationsPage() {
@@ -1456,6 +1521,7 @@ export default function MenuRecommendationsPage() {
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [likedMenus, setLikedMenus] = useState<Set<string>>(new Set());
   const [servings, setServings] = useState(2);
+  const [cookConfirmMenu, setCookConfirmMenu] = useState<MenuItem | null>(null);
 
   useEffect(() => {
     try {
@@ -1622,17 +1688,48 @@ export default function MenuRecommendationsPage() {
             </p>
             <button
               type="button"
-              onClick={() => {
-                setSelectedMenu(menu);
-                setServings(2);
-              }}
-              className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+              onClick={() => setCookConfirmMenu(menu)}
+              className="mt-3 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
             >
-              ดูสูตร
+              🍳 ทำเมนูนี้
             </button>
           </article>
         ))}
       </section>
+
+      {/* ── Cook confirm dialog ── */}
+      {cookConfirmMenu && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-xs rounded-2xl bg-white p-6 shadow-2xl mx-4 text-center">
+            <span className="text-5xl block mb-3">{cookConfirmMenu.emoji}</span>
+            <h3 className="text-lg font-semibold text-slate-900 mb-1">{cookConfirmMenu.name}</h3>
+            <p className="text-sm text-slate-500 mb-5">เริ่มทำเมนูนี้เลยไหม? ใช้เวลาประมาณ {cookConfirmMenu.prep}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setCookConfirmMenu(null)}
+                className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+              >
+                ยังก่อน
+              </button>
+              <button
+                onClick={() => {
+                  recordCook(cookConfirmMenu.id, {
+                    name: cookConfirmMenu.name,
+                    emoji: cookConfirmMenu.emoji,
+                    img: cookConfirmMenu.recipeImage,
+                  });
+                  setSelectedMenu(cookConfirmMenu);
+                  setServings(2);
+                  setCookConfirmMenu(null);
+                }}
+                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
+              >
+                เริ่มทำเลย!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedMenu && (
         <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/55 backdrop-blur-sm">

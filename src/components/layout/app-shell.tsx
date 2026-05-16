@@ -35,6 +35,27 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
   const { user, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen]         = useState(false);
+  const [isNotifOpen, setIsNotifOpen]       = useState(false);
+  const [profile, setProfile] = useState<{ name?: string; email?: string; avatarDataUrl?: string } | null>(null);
+
+  useEffect(() => {
+    function loadProfile() {
+      const raw = localStorage.getItem("user_profile");
+      if (!raw) return;
+      try { setProfile(JSON.parse(raw)); } catch {}
+    }
+    loadProfile();
+    window.addEventListener("profile_updated", loadProfile);
+    return () => window.removeEventListener("profile_updated", loadProfile);
+  }, []);
+
+  const notifItems = [
+    { emoji: "🥩", bg: "bg-red-50",    name: "เนื้อสันในวัว",          code: "RM-001", qty: "2.5 กก.",  daysLeft: 1, expiry: "17 พ.ค. 2569", badge: "bg-red-100 text-red-600",    expClass: "text-red-500" },
+    { emoji: "🥛", bg: "bg-blue-50",   name: "นมสดพาสเจอร์ไรส์",       code: "DA-004", qty: "3 ขวด",   daysLeft: 2, expiry: "18 พ.ค. 2569", badge: "bg-orange-100 text-orange-600", expClass: "text-orange-500" },
+    { emoji: "🥚", bg: "bg-amber-50",  name: "ไข่ไก่ เบอร์ 2",           code: "EG-002", qty: "20 ฟอง",  daysLeft: 3, expiry: "19 พ.ค. 2569", badge: "bg-amber-100 text-amber-600",  expClass: "text-amber-500" },
+    { emoji: "🌾", bg: "bg-yellow-50", name: "แป้งสาลีเนกประสงค์",      code: "ING-010", qty: "1.2 กก.", daysLeft: 5, expiry: "21 พ.ค. 2569", badge: "bg-yellow-100 text-yellow-600", expClass: "text-yellow-600" },
+    { emoji: "🫙", bg: "bg-slate-50",  name: "ซอสหอยนางรม",          code: "ING-015", qty: "1 ขวด",   daysLeft: 7, expiry: "23 พ.ค. 2569", badge: "bg-green-100 text-green-600",   expClass: "text-green-600" },
+  ];
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,16 +77,16 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
   }
 
   return (
-    <div className="min-h-screen bg-white md:bg-[radial-gradient(circle_at_18%_10%,#eef3eb_0%,#e7ece7_36%,#e3e7e3_100%)] md:p-6 xl:p-10">
+    <div className="min-h-screen bg-white md:bg-[radial-gradient(circle_at_18%_10%,#eef3eb_0%,#e7ece7_36%,#e3e7e3_100%)] md:p-6 xl:p-10 dark:bg-slate-950 dark:md:bg-slate-950">
 
       {/* Mobile sticky top bar */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-100 bg-white/95 px-4 backdrop-blur-sm md:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-100 bg-white/95 px-4 backdrop-blur-sm md:hidden dark:bg-slate-900/95 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-base">🍊</div>
           <p className="font-[family-name:var(--font-display)] text-base font-semibold leading-none text-slate-900">Kin-Tan</p>
         </div>
         <div className="flex items-center gap-1.5">
-          <button type="button" className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500">
+          <button type="button" onClick={() => setIsNotifOpen(true)} className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500">
             <Bell className="h-4 w-4" />
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">3</span>
           </button>
@@ -75,8 +96,10 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
           </a>
           <div className="relative">
             <button type="button" onClick={() => setIsUserMenuOpen((p) => !p)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
-              {(user?.email?.[0] || "K").toUpperCase()}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700 overflow-hidden">
+              {profile?.avatarDataUrl
+                ? <img src={profile.avatarDataUrl} alt="avatar" className="w-full h-full object-cover" />
+                : (profile?.name?.[0] || user?.email?.[0] || "K").toUpperCase()}
             </button>
             {isUserMenuOpen && (
               <div className="absolute right-0 top-11 z-50 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
@@ -90,15 +113,15 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
       </header>
 
       {/* Tablet/Desktop card layout */}
-      <div className="md:mx-auto md:grid md:w-full md:max-w-6xl md:overflow-hidden md:rounded-[1.6rem] md:border md:border-slate-200 md:bg-white md:shadow-[0_18px_60px_-28px_rgba(15,23,42,0.35)] md:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr]">
+      <div className="md:mx-auto md:grid md:w-full md:max-w-6xl md:overflow-hidden md:rounded-[1.6rem] md:border md:border-slate-200 md:bg-white md:shadow-[0_18px_60px_-28px_rgba(15,23,42,0.35)] md:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr] dark:md:bg-slate-900 dark:md:border-slate-700">
 
         {/* Sidebar (tablet+) */}
-        <aside className="hidden md:flex md:flex-col border-r border-slate-200 bg-slate-50/90 p-5">
-          <div className="rounded-2xl border border-emerald-100 bg-white p-4">
+        <aside className="hidden md:flex md:flex-col border-r border-slate-200 bg-slate-50/90 p-5 dark:bg-slate-900 dark:border-slate-700">
+            <div className="rounded-2xl border border-emerald-100 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex items-center gap-3">
               <div className="grid h-11 w-11 place-items-center rounded-full bg-emerald-100 text-xl">🍊</div>
               <div>
-                <p className="font-[family-name:var(--font-display)] text-xl text-slate-900">Kin-Tan</p>
+                <p className="font-[family-name:var(--font-display)] text-xl text-slate-900 dark:text-slate-100">Kin-Tan</p>
                 <p className="text-xs text-slate-500">จัดการของกิน ไม่ทิ้ง ไม่เสีย</p>
               </div>
             </div>
@@ -108,7 +131,7 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
               const active = pathname === item.href;
               return (
                 <Link key={item.href} href={item.href}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${active ? "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${active ? "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200 dark:bg-slate-800 dark:text-emerald-400 dark:ring-slate-700" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"}`}
                 >
                   <span className={active ? "text-emerald-600" : "text-slate-400"}>{item.icon}</span>
                   {item.label}
@@ -127,13 +150,13 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
         <section className="px-4 py-4 pb-24 md:p-6 md:pb-6">
 
           {/* Desktop header bar */}
-          <header className="mb-5 hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 md:flex">
-            <div className="flex flex-1 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-400">
+          <header className="mb-5 hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 md:flex dark:bg-slate-900 dark:border-slate-700">
+            <div className="flex flex-1 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-400 dark:bg-slate-800 dark:border-slate-700">
               <Search className="h-4 w-4 shrink-0" />
               <span className="truncate">ค้นหาวัตถุดิบ / เมนู / ร้านค้า...</span>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-50">
+              <button type="button" onClick={() => setIsNotifOpen(true)} className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-50">
                 <Bell className="h-5 w-5" />
                 <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">3</span>
               </button>
@@ -146,10 +169,12 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
                 <button type="button" onClick={() => setIsUserMenuOpen((p) => !p)}
                   className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
                   aria-expanded={isUserMenuOpen} aria-haspopup="menu">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
-                    {(user?.email?.[0] || "K").toUpperCase()}
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700 overflow-hidden">
+                    {profile?.avatarDataUrl
+                      ? <img src={profile.avatarDataUrl} alt="avatar" className="w-full h-full object-cover" />
+                      : (profile?.name?.[0] || user?.email?.[0] || "K").toUpperCase()}
                   </div>
-                  <span className="hidden lg:inline">สวัสดี, {user?.email?.split("@")[0] || "คุณกินทัน"}</span>
+                  <span className="hidden lg:inline">สวัสดี, {profile?.name || user?.email?.split("@")[0] || "คุณกินทัน"}</span>
                   <ChevronDown className={`h-4 w-4 text-slate-400 transition ${isUserMenuOpen ? "rotate-180" : ""}`} />
                 </button>
                 {isUserMenuOpen && (
@@ -164,11 +189,11 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
           </header>
 
           {/* Page title */}
-          <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+          <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 dark:bg-slate-900 dark:border-slate-700">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h1 className="text-base font-semibold text-slate-900 sm:text-lg md:text-xl">{title}</h1>
-                {subtitle && <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">{subtitle}</p>}
+                <h1 className="text-base font-semibold text-slate-900 sm:text-lg md:text-xl dark:text-slate-100">{title}</h1>
+                {subtitle && <p className="mt-0.5 text-xs text-slate-500 sm:text-sm dark:text-slate-400">{subtitle}</p>}
               </div>
               {headerAction && <div className="shrink-0">{headerAction}</div>}
             </div>
@@ -179,7 +204,7 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
       </div>
 
       {/* Mobile bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm md:hidden"
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm md:hidden dark:bg-slate-900/95 dark:border-slate-800"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <div className="flex">
           {bottomNavItems.map((item) => {
@@ -204,7 +229,7 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
       {isMoreOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsMoreOpen(false)} />
-          <div className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-5 pt-5 pb-10 shadow-2xl">
+          <div className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-5 pt-5 pb-10 shadow-2xl dark:bg-slate-900">
             <div className="mb-5 flex items-center justify-between">
               <p className="text-base font-semibold text-slate-900">เมนูเพิ่มเติม</p>
               <button type="button" onClick={() => setIsMoreOpen(false)}
@@ -226,6 +251,62 @@ export default function AppShell({ title, subtitle, headerAction, children }: Ap
                 );
               })}
             </nav>
+          </div>
+        </div>
+      )}
+      {/* Notification dialog */}
+      {isNotifOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100">
+              <span className="text-xl">🔔</span>
+              <h3 className="flex-1 text-base font-bold text-slate-900">แจ้งเตือนวัตถุดิบ/สินค้าใกล้หมดอายุ</h3>
+              <button onClick={() => setIsNotifOpen(false)} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 text-sm">✕</button>
+            </div>
+            {/* Warning banner */}
+            <div className="mx-4 mt-3 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+              <span className="text-xl shrink-0">⚠️</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-800">พบวัตถุดิบ/สินค้าใกล้หมดอายุ {notifItems.length} รายการ</p>
+                <p className="text-xs text-amber-600">กรุณาตรวจสอบและวางแผนการใช้งานก่อนหมดอายุ</p>
+              </div>
+              <Link href="/expiring-soon" onClick={() => setIsNotifOpen(false)}
+                className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50">
+                ดูทั้งหมด
+              </Link>
+            </div>
+            {/* Item list */}
+            <ul className="flex-1 overflow-y-auto divide-y divide-slate-50 px-2 mt-2">
+              {notifItems.map((item, i) => (
+                <li key={i}>
+                  <Link href="/expiring-soon" onClick={() => setIsNotifOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 transition">
+                    <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl text-3xl ${item.bg}`}>
+                      {item.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 truncate">{item.name}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">คงเหลือ: {item.qty}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${item.badge}`}>
+                        เหลือ {item.daysLeft} วัน
+                      </span>
+                      <p className={`mt-0.5 text-[11px] font-medium ${item.expClass}`}>หมดอายุ {item.expiry}</p>
+                    </div>
+                    <span className="text-slate-300 text-sm">›</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {/* Footer */}
+            <div className="flex items-center border-t border-slate-100 px-5 py-3">
+              <span className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                <span className="text-sm">🗓️</span>
+                อัปเดตล่าสุด 16 พ.ค. 2569 เวลา 09:30 น.
+              </span>
+            </div>
           </div>
         </div>
       )}

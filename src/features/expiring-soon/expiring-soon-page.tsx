@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X, Heart } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
+import { recordCook } from "@/lib/cook-stats";
 
 interface Recipe {
   id: string;
@@ -290,6 +291,10 @@ export default function ExpiringSoonPage() {
               <button
                 onClick={() => {
                   if (cookingRecipe?.menuId) {
+                    recordCook(cookingRecipe.menuId, {
+                      name: cookingRecipe.name,
+                      emoji: cookingRecipe.emoji,
+                    });
                     setCookingRecipe(null);
                     setSelectedItem(null);
                     router.push(`/menu-recommendations?menu=${cookingRecipe.menuId}`);

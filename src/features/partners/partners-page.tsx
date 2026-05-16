@@ -19,7 +19,14 @@ interface PromoInfo {
   bgClass: string;
   titleColor: string;
   subtitleColor: string;
-  imageEmojis: string[]; // hex codes for /promos/emoji/{hex}.svg
+  imageEmojis: string[];
+}
+
+interface Branch {
+  name: string;
+  address: string;
+  distance: number;
+  hours: string;
 }
 
 interface Partner {
@@ -34,6 +41,7 @@ interface Partner {
   promo: PromoInfo;
   deliveryMin: number;
   distance: number;
+  branches: Branch[];
 }
 
 const FILTERS: { value: CategoryFilter; label: string; icon: React.ReactNode }[] = [
@@ -71,6 +79,12 @@ const partners: Partner[] = [
     },
     deliveryMin: 699,
     distance: 1.2,
+    branches: [
+      { name: "สาขาลาดพร้าว",         address: "2142 ถ.ลาดพร้าว แขวงโชคดี",       distance: 1.2, hours: "07:00-22:00" },
+      { name: "สาขารัชดาภิเษก",        address: "88 ถ.รัชดาภิเษก แขวงลาดยาว",       distance: 2.8, hours: "07:00-22:00" },
+      { name: "สาขาเซ็นทรัลเวิลด์",    address: "999/9 ถ.พระราม 1 ปทุมวัน",          distance: 4.5, hours: "08:00-22:00" },
+      { name: "สาขาบางกะปิ",           address: "18 ถ.บางกะปิ เขตบางกะปิ",           distance: 6.1, hours: "07:00-22:00" },
+    ],
   },
   {
     id: "bigc",
@@ -92,6 +106,11 @@ const partners: Partner[] = [
     },
     deliveryMin: 599,
     distance: 2.5,
+    branches: [
+      { name: "สาขาแจ้งวัฒนะ",         address: "345 ถ.แจ้งวัฒนะ อ.ปากเกร็ด",          distance: 2.5, hours: "07:00-22:00" },
+      { name: "สาขาฟิวเจอร์พาร์ค",     address: "94 ถ.พหลโยธิน เขตจตุจักร",            distance: 3.9, hours: "07:00-22:00" },
+      { name: "สาขาบางใหญ่",            address: "888 ถ.บางใหญ่ เขตบางกอก",              distance: 5.2, hours: "07:00-22:00" },
+    ],
   },
   {
     id: "tops",
@@ -114,6 +133,11 @@ const partners: Partner[] = [
     },
     deliveryMin: 1000,
     distance: 3.1,
+    branches: [
+      { name: "สาขาเซ็นทรัลเวิลด์",    address: "999 ถ.พระราม 1 ปทุมวัน",               distance: 3.1, hours: "10:00-22:00" },
+      { name: "สาขาเซ็นทรัลลาดพร้าว",  address: "1693 ถ.พหลโยธิน แขวงลาดยาว",           distance: 4.6, hours: "10:00-22:00" },
+      { name: "สาขาเอ็มควอเทียร์",      address: "693 ถ.สุขุมวิท เขตคลองเตย",            distance: 5.8, hours: "10:00-22:00" },
+    ],
   },
   {
     id: "makro",
@@ -135,6 +159,11 @@ const partners: Partner[] = [
     },
     deliveryMin: 1500,
     distance: 6.3,
+    branches: [
+      { name: "สาขาลาดพร้าว",           address: "3195 ถ.ลาดพร้าว เขตวังทองหลาง",        distance: 6.3, hours: "06:00-22:00" },
+      { name: "สาขาบางนา",              address: "99 ถ.บางนา-ตราด เขตบางนา",             distance: 8.9, hours: "06:00-22:00" },
+      { name: "สาขาดอนเมือง",           address: "333 ถ.วิภาวดีรังสิต เขตดอนเมือง",      distance: 11.4, hours: "06:00-22:00" },
+    ],
   },
   {
     id: "cjmore",
@@ -156,6 +185,11 @@ const partners: Partner[] = [
     },
     deliveryMin: 200,
     distance: 0.8,
+    branches: [
+      { name: "สาขาถ.รัชดาภิเษก",      address: "120 ถ.รัชดาภิเษก เขตลาดยาว",           distance: 0.8, hours: "07:00-22:00" },
+      { name: "สาขาถ.พหลโยธิน",        address: "456 ถ.พหลโยธิน แขวงสะพานใหม่",         distance: 1.5, hours: "07:00-22:00" },
+      { name: "สาขาลาดยาว",             address: "78 ถ.ลาดยาว แขวงจตุจักร",               distance: 2.3, hours: "07:00-22:00" },
+    ],
   },
   {
     id: "7eleven",
@@ -177,6 +211,12 @@ const partners: Partner[] = [
     },
     deliveryMin: 150,
     distance: 0.5,
+    branches: [
+      { name: "สาขาใกล้บ้าน 1",         address: "12 ถ.พหลโยธิน แขวงสะพานใหม่",          distance: 0.5, hours: "24 ชั่วโมง" },
+      { name: "สาขาใกล้บ้าน 2",         address: "77 ถ.รัชดาภิเษก แขวงลาดยาว",           distance: 0.9, hours: "24 ชั่วโมง" },
+      { name: "สาขาตลาดสด",             address: "234 ถ.ลาดพร้าว แขวงโชคดี",              distance: 1.3, hours: "24 ชั่วโมง" },
+      { name: "สาขาอาคารสำนักงาน",       address: "555 ถ.พหลโยธิน เขตจตุจักร",            distance: 2.0, hours: "24 ชั่วโมง" },
+    ],
   },
 ];
 
@@ -186,17 +226,23 @@ export default function PartnersPage() {
   const [sortOpen, setSortOpen]         = useState(false);
   const [brokenLogos, setBrokenLogos]   = useState<Set<string>>(new Set());
   const [infoOpen, setInfoOpen]         = useState(false);
+  const [branchOpen, setBranchOpen]     = useState<string | null>(null);
+  const [selectedBranchIdx, setSelectedBranchIdx] = useState<Record<string, number>>({});
+
+  const getBranchDistance = (p: Partner) =>
+    p.branches[selectedBranchIdx[p.id] ?? 0]?.distance ?? p.distance;
 
   const filtered = useMemo(() => {
     let list = [...partners];
     if (activeFilter === "nearme") {
-      list = list.sort((a, b) => a.distance - b.distance);
+      list = list.sort((a, b) => getBranchDistance(a) - getBranchDistance(b));
     } else if (activeFilter !== "all") {
       list = list.filter((p) => p.category === activeFilter);
     }
-    if (sortOption === "nearest") list = [...list].sort((a, b) => a.distance - b.distance);
+    if (sortOption === "nearest") list = [...list].sort((a, b) => getBranchDistance(a) - getBranchDistance(b));
     return list;
-  }, [activeFilter, sortOption]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilter, sortOption, selectedBranchIdx]);
 
   const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortOption)?.label ?? "แนะนำ";
 
@@ -335,14 +381,12 @@ export default function PartnersPage() {
 
               {/* Action buttons */}
               <div className="flex gap-2 px-3 pb-3">
-                <a
-                  href={partner.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => setBranchOpen(partner.id)}
                   className="flex-1 rounded-xl border border-slate-200 py-2 text-center text-[12px] font-medium text-slate-700 transition hover:bg-slate-50"
                 >
-                  ดูรายละเอียด
-                </a>
+                  ดูสาขา
+                </button>
                 <a
                   href={partner.websiteUrl}
                   target="_blank"
@@ -361,7 +405,10 @@ export default function PartnersPage() {
                 </span>
                 <span className="flex items-center gap-1 text-[11px] text-slate-500">
                   <Navigation className="h-3 w-3 text-slate-400" />
-                  {partner.distance} กม.
+                  {getBranchDistance(partner)} กม.
+                  {(selectedBranchIdx[partner.id] ?? 0) > 0 && (
+                    <span className="text-emerald-600 font-medium">• {partner.branches[selectedBranchIdx[partner.id]].name}</span>
+                  )}
                 </span>
               </div>
             </article>
@@ -392,6 +439,54 @@ export default function PartnersPage() {
           </div>
         </div>
       </div>
+
+      {/* Branch selection dialog */}
+      {branchOpen && (() => {
+        const p = partners.find(x => x.id === branchOpen)!;
+        const currentIdx = selectedBranchIdx[p.id] ?? 0;
+        return (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                <div>
+                  <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wide">เลือกสาขา</p>
+                  <h3 className="text-base font-bold text-slate-900">{p.name}</h3>
+                </div>
+                <button onClick={() => setBranchOpen(null)} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-slate-100 text-slate-500">
+                  ✕
+                </button>
+              </div>
+              {/* Branch list */}
+              <ul className="max-h-72 overflow-y-auto divide-y divide-slate-50">
+                {p.branches.map((b, i) => (
+                  <li key={i}>
+                    <button
+                      onClick={() => {
+                        setSelectedBranchIdx(prev => ({ ...prev, [p.id]: i }));
+                        setBranchOpen(null);
+                      }}
+                      className={`w-full flex items-center gap-3 px-5 py-3.5 text-left transition hover:bg-slate-50 ${i === currentIdx ? "bg-emerald-50" : ""}`}
+                    >
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${i === currentIdx ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"}`}>
+                        {i === currentIdx ? "✓" : i + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-semibold truncate ${i === currentIdx ? "text-emerald-700" : "text-slate-800"}`}>{b.name}</p>
+                        <p className="text-[11px] text-slate-400 truncate">{b.address}</p>
+                        <p className="text-[11px] text-slate-400">{b.hours}</p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className={`text-sm font-bold ${i === currentIdx ? "text-emerald-600" : "text-slate-600"}`}>{b.distance} กม.</p>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Info modal */}
       {infoOpen && (
