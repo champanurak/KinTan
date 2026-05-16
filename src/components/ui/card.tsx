@@ -7,11 +7,11 @@ interface CardProps {
 
 export default function Card({ children, className = "", title, subtitle }: CardProps) {
   return (
-    <article className={`rounded-xl border border-slate-200 bg-white p-4 ${className}`}>
+    <article className={`rounded-xl border border-slate-700 bg-slate-800/60 p-4 ${className}`}>
       {title && (
         <>
-          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-          {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
+          <h3 className="text-sm font-semibold text-slate-100">{title}</h3>
+          {subtitle && <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>}
         </>
       )}
       {title && <div className="mt-3">{children}</div>}
@@ -38,9 +38,9 @@ export function StatCard({ label, value, note, icon, iconClassName = "bg-emerald
           </div>
         ) : null}
         <div>
-          <p className="text-sm font-medium text-slate-700">{label}</p>
-          <p className="mt-1 text-[2rem] font-semibold leading-none text-slate-900">{value}</p>
-          {note && <p className="mt-1 text-sm text-slate-500">{note}</p>}
+          <p className="text-sm font-medium text-slate-300">{label}</p>
+          <p className="mt-1 text-[2rem] font-semibold leading-none text-slate-100">{value}</p>
+          {note && <p className="mt-1 text-sm text-slate-400">{note}</p>}
         </div>
       </div>
     </Card>

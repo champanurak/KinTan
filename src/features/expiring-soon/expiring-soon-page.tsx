@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X, Heart } from "lucide-react";
+import { X, Clock } from "lucide-react";
+import { CookConfirmDialog } from "@/components/ui/cook-confirm-dialog";
+import { NutritionGrid } from "@/components/ui/nutrition-grid";
+import { LikeButton } from "@/components/ui/like-button";
 import AppShell from "@/components/layout/app-shell";
 import { recordCook } from "@/lib/cook-stats";
 
@@ -162,11 +165,11 @@ export default function ExpiringSoonPage() {
     <AppShell title="แจ้งเตือน" subtitle="ดูรายการที่ควรใช้ก่อนเพื่อลดการทิ้งอาหาร">
 
       {urgentCount > 0 && (
-        <div className="mb-5 flex items-center gap-3 rounded-2xl bg-red-50 border border-red-200 px-5 py-4">
+        <div className="mb-5 flex items-center gap-3 rounded-2xl bg-red-900/30 border border-red-700/50 px-5 py-4">
           <span className="text-2xl">⚠️</span>
           <div>
-            <p className="font-semibold text-red-700">มี {urgentCount} รายการที่หมดอายุภายใน 2 วัน!</p>
-            <p className="text-sm text-red-500">ควรรีบนำไปปรุงอาหารก่อนนะ</p>
+            <p className="font-semibold text-red-400">มี {urgentCount} รายการที่หมดอายุภายใน 2 วัน!</p>
+            <p className="text-sm text-red-500/80">ควรรีบนำไปปรุงอาหารก่อนนะ</p>
           </div>
         </div>
       )}
@@ -175,7 +178,7 @@ export default function ExpiringSoonPage() {
         {ITEM_DATA.map(item => {
           const urgent = item.daysLeft <= 2;
           return (
-            <div key={item.name} className={`rounded-2xl border overflow-hidden bg-white shadow-sm ${item.color}`}>
+            <div key={item.name} className={`rounded-2xl border overflow-hidden bg-slate-800/60 shadow-sm ${item.color}`}>
               <div className={`h-36 bg-gradient-to-br ${item.image} flex items-center justify-center relative`}>
                 <span className="text-7xl select-none">{item.emoji}</span>
                 <span className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-bold ${urgent ? "bg-red-500 text-white" : "bg-slate-700/70 text-white"}`}>
@@ -183,8 +186,8 @@ export default function ExpiringSoonPage() {
                 </span>
               </div>
               <div className="p-4">
-                <p className="text-base font-semibold text-slate-900">{item.name}</p>
-                <p className={`mt-0.5 text-sm ${urgent ? "text-red-500 font-medium" : "text-slate-500"}`}>
+                <p className="text-base font-semibold text-slate-100">{item.name}</p>
+                <p className={`mt-0.5 text-sm ${urgent ? "text-red-400 font-medium" : "text-slate-400"}`}>
                   {urgent ? `⚠️ ด่วน! เหลือ ${item.daysLeft} วัน` : `เหลือ ${item.daysLeft} วันก่อนหมดอายุ`}
                 </p>
                 <button
@@ -201,20 +204,20 @@ export default function ExpiringSoonPage() {
 
       {/* Recipe list dialog */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-h-[90vh] flex flex-col">
-            <div className="px-6 pt-6 pb-4 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-slate-800 border border-slate-700 rounded-t-3xl sm:rounded-2xl shadow-2xl max-h-[90vh] flex flex-col">
+            <div className="px-6 pt-6 pb-4 border-b border-slate-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{selectedItem.emoji}</span>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">เมนูจาก{selectedItem.name}</h3>
-                    <p className="text-xs text-slate-500">{selectedItem.recipes.length} เมนูแนะนำ · เมนูที่ถูกใจขึ้นก่อน</p>
+                    <h3 className="text-lg font-semibold text-slate-100">เมนูจาก{selectedItem.name}</h3>
+                    <p className="text-xs text-slate-400">{selectedItem.recipes.length} เมนูแนะนำ · เมนูที่ถูกใจขึ้นก่อน</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-slate-400 hover:bg-slate-600 transition"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -225,44 +228,39 @@ export default function ExpiringSoonPage() {
               {sortedRecipes(selectedItem.recipes).map(recipe => {
                 const isLiked = liked.has(recipe.id);
                 return (
-                  <div key={recipe.id} className={`rounded-2xl border p-4 transition ${isLiked ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white"}`}>
+                  <div key={recipe.id} className={`rounded-2xl border p-4 transition ${isLiked ? "border-emerald-700/60 bg-emerald-900/30" : "border-slate-700 bg-slate-800"}`}>
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <span className="text-3xl">{recipe.emoji}</span>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-700 text-2xl">
+                          {recipe.emoji}
+                        </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-semibold text-slate-900">{recipe.name}</p>
-                            {isLiked && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">❤️ ถูกใจ</span>}
+                            <p className="font-semibold text-slate-100">{recipe.name}</p>
+                            {isLiked && <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">❤️ ถูกใจ</span>}
                           </div>
-                          <p className="text-xs text-slate-500">⏱ {recipe.time} นาที</p>
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                            <Clock className="h-3 w-3" /> {recipe.time} นาที
+                          </p>
                         </div>
                       </div>
-                      <button
+                      <LikeButton
+                        liked={isLiked}
                         onClick={() => toggleLike(recipe.id, recipe.menuId)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-full transition ${isLiked ? "bg-red-100 text-red-500 hover:bg-red-200" : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}
-                      >
-                        <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
-                      </button>
+                      />
                     </div>
 
-                    <div className="grid grid-cols-4 gap-2 mb-3">
-                      {[
-                        { label: "แคลอรี่", value: recipe.calories, unit: "kcal", color: "text-orange-600" },
-                        { label: "โปรตีน", value: recipe.protein, unit: "g", color: "text-blue-600" },
-                        { label: "คาร์บ", value: recipe.carbs, unit: "g", color: "text-amber-600" },
-                        { label: "ไขมัน", value: recipe.fat, unit: "g", color: "text-red-500" },
-                      ].map(n => (
-                        <div key={n.label} className="rounded-lg bg-slate-50 px-2 py-1.5 text-center">
-                          <p className={`text-sm font-bold ${n.color}`}>{n.value}</p>
-                          <p className="text-[10px] text-slate-500">{n.unit}</p>
-                          <p className="text-[10px] text-slate-400">{n.label}</p>
-                        </div>
-                      ))}
-                    </div>
+                    <NutritionGrid
+                      calories={recipe.calories}
+                      protein={recipe.protein}
+                      carb={recipe.carbs}
+                      fat={recipe.fat}
+                      className="mb-3"
+                    />
 
                     <button
                       onClick={() => setCookingRecipe(recipe)}
-                      className="w-full rounded-xl bg-emerald-600 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition"
+                      className="w-full rounded-full bg-emerald-700 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition"
                     >
                       🍳 ทำเมนูนี้
                     </button>
@@ -274,60 +272,45 @@ export default function ExpiringSoonPage() {
         </div>
       )}
 
-      {/* Cooking confirm */}
       {cookingRecipe && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-xs rounded-2xl bg-white p-6 shadow-2xl mx-4 text-center">
-            <span className="text-5xl block mb-3">{cookingRecipe.emoji}</span>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">{cookingRecipe.name}</h3>
-            <p className="text-sm text-slate-500 mb-5">เริ่มทำเมนูนี้เลยไหม? ใช้เวลาประมาณ {cookingRecipe.time} นาที</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setCookingRecipe(null)}
-                className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
-              >
-                ยังก่อน
-              </button>
-              <button
-                onClick={() => {
-                  if (cookingRecipe?.menuId) {
-                    recordCook(cookingRecipe.menuId, {
-                      name: cookingRecipe.name,
-                      emoji: cookingRecipe.emoji,
-                    });
-                    setCookingRecipe(null);
-                    setSelectedItem(null);
-                    router.push(`/menu-recommendations?menu=${cookingRecipe.menuId}`);
-                  } else {
-                    if (cookingRecipe) setGuideRecipe(cookingRecipe);
-                    setCookingRecipe(null);
-                    setSelectedItem(null);
-                  }
-                }}
-                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
-              >
-                เริ่มทำเลย!
-              </button>
-            </div>
-          </div>
-        </div>
+        <CookConfirmDialog
+          emoji={cookingRecipe.emoji}
+          name={cookingRecipe.name}
+          time={`${cookingRecipe.time} นาที`}
+          onCancel={() => setCookingRecipe(null)}
+          onConfirm={() => {
+            if (cookingRecipe?.menuId) {
+              recordCook(cookingRecipe.menuId, {
+                name: cookingRecipe.name,
+                emoji: cookingRecipe.emoji,
+              });
+              setCookingRecipe(null);
+              setSelectedItem(null);
+              router.push(`/menu-recommendations?menu=${cookingRecipe.menuId}`);
+            } else {
+              if (cookingRecipe) setGuideRecipe(cookingRecipe);
+              setCookingRecipe(null);
+              setSelectedItem(null);
+            }
+          }}
+        />
       )}
 
       {/* Recipe guide dialog */}
       {guideRecipe && (
-        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/55 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl max-h-[92vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-t-3xl sm:rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-700 px-6 py-4">
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{guideRecipe.emoji}</span>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900">สูตร: {guideRecipe.name}</h3>
-                  <p className="text-xs text-slate-500">เวลาโดยประมาณ {guideRecipe.time} นาที</p>
+                  <h3 className="text-lg font-semibold text-slate-100">สูตร: {guideRecipe.name}</h3>
+                  <p className="text-xs text-slate-400">เวลาโดยประมาณ {guideRecipe.time} นาที</p>
                 </div>
               </div>
               <button
                 onClick={() => setGuideRecipe(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-slate-400 hover:bg-slate-600 transition"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -335,21 +318,21 @@ export default function ExpiringSoonPage() {
 
             <div className="overflow-y-auto px-6 py-5">
               <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-                  <h4 className="mb-3 font-semibold text-emerald-800">ส่วนผสม</h4>
-                  <ul className="space-y-2 text-sm text-slate-700">
+                <div className="rounded-2xl border border-emerald-800/60 bg-emerald-900/30 p-4">
+                  <h4 className="mb-3 font-semibold text-emerald-400">ส่วนผสม</h4>
+                  <ul className="space-y-2 text-sm text-slate-300">
                     {getRecipeGuide(guideRecipe).ingredients.map((ing) => (
                       <li key={ing} className="flex items-start gap-2">
-                        <span className="mt-0.5 text-emerald-600">•</span>
+                        <span className="mt-0.5 text-emerald-500">•</span>
                         <span>{ing}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-                  <h4 className="mb-3 font-semibold text-blue-800">วิธีทำ</h4>
-                  <ol className="space-y-2 text-sm text-slate-700">
+                <div className="rounded-2xl border border-blue-800/60 bg-blue-900/30 p-4">
+                  <h4 className="mb-3 font-semibold text-blue-400">วิธีทำ</h4>
+                  <ol className="space-y-2 text-sm text-slate-300">
                     {getRecipeGuide(guideRecipe).steps.map((step, idx) => (
                       <li key={`${guideRecipe.id}-${idx}`} className="flex items-start gap-2">
                         <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[11px] font-semibold text-white">
@@ -362,7 +345,7 @@ export default function ExpiringSoonPage() {
                 </div>
               </div>
 
-              <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+              <div className="mt-4 rounded-xl border border-slate-700 bg-slate-700/50 p-3 text-xs text-slate-400">
                 โภชนาการต่อจาน: {guideRecipe.calories} kcal, โปรตีน {guideRecipe.protein}g, คาร์บ {guideRecipe.carbs}g, ไขมัน {guideRecipe.fat}g
               </div>
             </div>

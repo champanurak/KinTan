@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
-import { Camera, ImageIcon, Filter, Pencil, Check, Plus } from "lucide-react";
+import { useState, useRef, useMemo, Fragment } from "react";
+import { Camera, ImageIcon, Filter, Pencil, Check, Plus, FileText, X } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
 
 type Item = {
@@ -15,6 +15,7 @@ type Item = {
 export default function ScanReceiptPage() {
   const [step, setStep] = useState(1);
   const [isAddingMoreReceipts, setIsAddingMoreReceipts] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([
     { id: 1, name: "อกไก่ 500 น.", unit: "แพ็ก", price: 65.0, quantity: 1 },
     { id: 2, name: "นมสด 1 ขวด", unit: "ขวด", price: 42.0, quantity: 1 },
@@ -30,6 +31,7 @@ export default function ScanReceiptPage() {
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
+      const imageUrl = reader.result as string;
       if (isAddingMoreReceipts) {
         // When adding more receipts, simulate adding new items and keep step 2 open
         const newItems: Item[] = [
@@ -40,8 +42,8 @@ export default function ScanReceiptPage() {
         setIsAddingMoreReceipts(false);
         // Stay on step 2 to review merged items
       } else {
-        // First receipt scan - move to step 2
-        setTimeout(() => setStep(2), 100);
+        // First receipt scan — show image preview; user clicks button to proceed to step 2
+        setUploadedImageUrl(imageUrl);
       }
     };
     reader.readAsDataURL(file);
@@ -110,30 +112,30 @@ export default function ScanReceiptPage() {
   return (
     <AppShell title="สแกนใบเสร็จ" subtitle="อัปโหลดรูปใบเสร็จเพื่อแยกรายการสินค้าอัตโนมัติ">
       {/* Step Indicator */}
-      <div className="mb-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6">
+      <div className="mb-6 flex items-center rounded-2xl border border-slate-700 bg-slate-800/60 px-6 py-5">
         {stepConfig.map((config, idx) => (
-          <div key={config.num} className="flex items-center flex-1">
+          <Fragment key={config.num}>
             {/* Circle + Label */}
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex shrink-0 flex-col items-center gap-2">
               <div
                 className={`flex h-10 w-10 items-center justify-center rounded-full font-semibold text-sm transition ${
                   step >= config.num
                     ? "bg-emerald-600 text-white"
-                    : "bg-slate-200 text-slate-600"
+                    : "bg-slate-600 text-slate-400"
                 }`}
               >
                 {config.num}
               </div>
-              <p className={`text-xs font-medium text-center ${step >= config.num ? "text-emerald-700" : "text-slate-500"}`}>
+              <p className={`text-xs font-medium text-center ${step >= config.num ? "text-emerald-400" : "text-slate-500"}`}>
                 {config.label}
               </p>
             </div>
 
-            {/* Connector line */}
+            {/* Connector line between steps */}
             {idx < stepConfig.length - 1 && (
-              <div className={`h-0.5 flex-1 mx-2 transition ${step > config.num ? "bg-emerald-600" : "bg-slate-200"}`} />
+              <div className={`h-0.5 flex-1 mx-4 mb-5 transition ${step > config.num ? "bg-emerald-600" : "bg-slate-600"}`} />
             )}
-          </div>
+          </Fragment>
         ))}
       </div>
 
@@ -141,18 +143,18 @@ export default function ScanReceiptPage() {
       {step === 1 && (
         <div className="grid gap-5 lg:grid-cols-2">
           {/* Left: Camera Input */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
             <button
               onClick={() => cameraInputRef.current?.click()}
-              className="w-full rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6 transition hover:bg-emerald-100"
+              className="w-full rounded-2xl border-2 border-emerald-700/60 bg-emerald-900/30 p-6 transition hover:bg-emerald-900/50"
             >
               <div className="flex flex-col items-center gap-3 text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600">
                   <Camera className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">สแกนใบเสร็จ</p>
-                  <p className="text-xs text-slate-600 mt-0.5">ถ่ายรูปใบเสร็จเพื่อสแกนอัตโนมัติ</p>
+                  <p className="font-semibold text-slate-100">สแกนใบเสร็จ</p>
+                  <p className="text-xs text-slate-400 mt-0.5">ถ่ายรูปใบเสร็จเพื่อสแกนอัตโนมัติ</p>
                 </div>
               </div>
             </button>
@@ -161,7 +163,7 @@ export default function ScanReceiptPage() {
 
             <button
               onClick={() => galleryInputRef.current?.click()}
-              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 flex items-center justify-center gap-2"
+              className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-slate-700 flex items-center justify-center gap-2"
             >
               <ImageIcon className="h-5 w-5" />
               อัปโหลดรูปจากแกลเลอรี่
@@ -184,49 +186,55 @@ export default function ScanReceiptPage() {
             />
           </div>
 
-          {/* Right: Receipt Preview */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              <p className="text-center font-bold text-lg text-slate-900 mb-3">Tops market</p>
-              <div className="space-y-2 border-b border-dashed border-slate-300 pb-3 mb-3">
-                <div className="flex justify-between text-xs">
-                  <span>วันที่</span>
-                  <span>20 เม.ค. 2567 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 15:30</span>
+          {/* Right: Receipt Preview — shows uploaded image or empty state */}
+          <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 flex items-center justify-center min-h-[240px]">
+            {uploadedImageUrl ? (
+              <div className="w-full space-y-4">
+                <div className="relative">
+                  <img
+                    src={uploadedImageUrl}
+                    alt="รูปใบเสร็จ"
+                    className="w-full rounded-xl object-contain max-h-72"
+                  />
+                  <button
+                    onClick={() => setUploadedImageUrl(null)}
+                    className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/70 text-slate-300 hover:bg-slate-700 transition"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => setStep(2)}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  วิเคราะห์ใบเสร็จ
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4 text-center py-6">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-600 bg-slate-700/50">
+                  <FileText className="h-7 w-7 text-slate-500" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-300">ไม่มีข้อมูล</p>
+                  <p className="text-xs text-slate-500 mt-1">สแกนหรืออัปโหลดใบเสร็จ<br />เพื่อแสดงรายการสินค้า</p>
                 </div>
               </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span>อกไก่ 500 น.</span>
-                  <span className="font-semibold text-slate-900">65.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>นมสด 1 ขวด</span>
-                  <span className="font-semibold text-slate-900">42.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>ไข่ไก่ 10 ฟอง</span>
-                  <span className="font-semibold text-slate-900">45.00</span>
-                </div>
-              </div>
-              <div className="border-t border-dashed border-slate-300 pt-3 mt-3 flex justify-between font-semibold">
-                <span>รวม</span>
-                <span className="text-emerald-700">152.00</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Step 2: Review Items */}
       {step === 2 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-6">
           {/* Header with items count and edit */}
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-emerald-600" />
-              <h3 className="font-semibold text-slate-900">รายการที่ตรวจพบ</h3>
+              <Filter className="h-5 w-5 text-emerald-400" />
+              <h3 className="font-semibold text-slate-100">รายการที่ตรวจพบ</h3>
             </div>
-            <button className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1 text-sm">
+            <button className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 text-sm">
               <Pencil className="h-4 w-4" />
               แก้ไขรายการ
             </button>
@@ -235,27 +243,27 @@ export default function ScanReceiptPage() {
           {/* Items list with quantity controls */}
           <div className="space-y-3 mb-6">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-200 text-xl">
+              <div key={item.id} className="flex items-center gap-3 rounded-xl bg-slate-700/50 p-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-700 text-xl">
                   {item.id === 1 && "🍗"}
                   {item.id === 2 && "🥛"}
                   {item.id === 3 && "🥚"}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-900">{item.name}</p>
-                  <p className="text-xs text-slate-500">{item.price.toFixed(2)} บาท · {item.unit}</p>
+                  <p className="truncate text-sm font-medium text-slate-100">{item.name}</p>
+                  <p className="text-xs text-slate-400">{item.price.toFixed(2)} บาท · {item.unit}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <button
                     onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:bg-slate-200"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-600 text-slate-300 hover:bg-slate-700"
                   >
                     −
                   </button>
-                  <span className="w-5 text-center text-sm font-semibold text-slate-900">{item.quantity}</span>
+                  <span className="w-5 text-center text-sm font-semibold text-slate-100">{item.quantity}</span>
                   <button
                     onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:bg-slate-200"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-600 text-slate-300 hover:bg-slate-700"
                   >
                     +
                   </button>
@@ -265,15 +273,15 @@ export default function ScanReceiptPage() {
           </div>
 
           {/* Summary */}
-          <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 flex items-center justify-between">
+          <div className="rounded-lg bg-emerald-900/30 border border-emerald-700/50 p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Check className="h-6 w-6 text-emerald-600" />
+              <Check className="h-6 w-6 text-emerald-400" />
               <div>
-                <p className="text-sm font-medium text-slate-900">ตรวจพบสินค้า {items.length} รายการ</p>
-                <p className="text-xs font-semibold text-emerald-700">รวมทั้งหมด {totalPrice.toFixed(2)} บาท</p>
+                <p className="text-sm font-medium text-slate-200">ตรวจพบสินค้า {items.length} รายการ</p>
+                <p className="text-xs font-semibold text-emerald-400">รวมทั้งหมด {totalPrice.toFixed(2)} บาท</p>
               </div>
             </div>
-            <button onClick={handleAddMoreReceipts} className="text-emerald-600 hover:text-emerald-700 flex items-center gap-1 text-sm">
+            <button onClick={handleAddMoreReceipts} className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 text-sm">
               <Plus className="h-4 w-4" />
               เพิ่มใบเสร็จ
             </button>
@@ -290,8 +298,9 @@ export default function ScanReceiptPage() {
             <button
               onClick={() => {
                 setStep(1);
+                setUploadedImageUrl(null);
               }}
-              className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+              className="flex-1 rounded-xl border border-slate-600 px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
             >
               ยกเลิก
             </button>
@@ -301,27 +310,27 @@ export default function ScanReceiptPage() {
 
       {/* Step 3: Confirmation */}
       {step === 3 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-6">
           <div className="text-center mb-8">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 mx-auto mb-4">
-              <Check className="h-8 w-8 text-emerald-600" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-900/50 mx-auto mb-4">
+              <Check className="h-8 w-8 text-emerald-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">บันทึกเสร็จสิ้น</h3>
-            <p className="text-slate-600">สินค้า {items.length} รายการได้ถูกบันทึกเข้าคลังของคุณแล้ว</p>
+            <h3 className="text-xl font-semibold text-slate-100 mb-2">บันทึกเสร็จสิ้น</h3>
+            <p className="text-slate-400">สินค้า {items.length} รายการได้ถูกบันทึกเข้าคลังของคุณแล้ว</p>
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-4 mb-6">
+          <div className="rounded-lg bg-slate-700/50 border border-slate-600 p-4 mb-6">
             <div className="space-y-2">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span className="text-slate-900 font-medium">{item.name} × {item.quantity}</span>
-                  <span className="font-medium text-slate-900">{(item.price * item.quantity).toFixed(2)} บาท</span>
+                  <span className="text-slate-200 font-medium">{item.name} × {item.quantity}</span>
+                  <span className="font-medium text-slate-200">{(item.price * item.quantity).toFixed(2)} บาท</span>
                 </div>
               ))}
             </div>
-            <div className="border-t border-slate-200 mt-3 pt-3 flex justify-between font-semibold">
-              <span className="text-slate-900">รวมทั้งหมด</span>
-              <span className="text-emerald-600">{totalPrice.toFixed(2)} บาท</span>
+            <div className="border-t border-slate-600 mt-3 pt-3 flex justify-between font-semibold">
+              <span className="text-slate-300">รวมทั้งหมด</span>
+              <span className="text-emerald-400">{totalPrice.toFixed(2)} บาท</span>
             </div>
           </div>
 
@@ -329,14 +338,18 @@ export default function ScanReceiptPage() {
             <button
               onClick={() => {
                 setStep(1);
+                setUploadedImageUrl(null);
               }}
               className="flex-1 rounded-xl bg-emerald-600 px-4 py-3 font-medium text-white transition hover:bg-emerald-700"
             >
               สแกนใบเสร็จอันถัดไป
             </button>
             <button
-              onClick={() => setStep(1)}
-              className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+              onClick={() => {
+                setStep(1);
+                setUploadedImageUrl(null);
+              }}
+              className="flex-1 rounded-xl border border-slate-600 px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
             >
               กลับหน้าหลัก
             </button>

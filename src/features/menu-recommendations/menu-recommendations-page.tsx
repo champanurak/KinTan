@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
 import { recordCook } from "@/lib/cook-stats";
+import { CookConfirmDialog } from "@/components/ui/cook-confirm-dialog";
 
 interface IngredientItem {
   name: string;
@@ -1630,7 +1631,7 @@ export default function MenuRecommendationsPage() {
       subtitle="เมนูที่เหมาะกับวัตถุดิบที่คุณมีอยู่ตอนนี้"
     >
       {pantryItems.length === 0 ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-800">
+        <div className="rounded-2xl border border-amber-700/50 bg-amber-900/30 p-5 text-amber-400">
           <p className="font-semibold">ยังไม่มีวัตถุดิบในคลัง</p>
           <p className="mt-1 text-sm">
             เพิ่มวัตถุดิบจากหน้า สแกนใบเสร็จ ก่อน
@@ -1640,7 +1641,7 @@ export default function MenuRecommendationsPage() {
       ) : null}
 
       {pantryItems.length > 0 && recommendedMenus.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-slate-700">
+        <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 text-slate-300">
           <p className="font-semibold">ยังไม่พบเมนูที่ตรงกับวัตถุดิบในคลัง</p>
           <p className="mt-1 text-sm">
             ลองเพิ่มวัตถุดิบให้หลากหลายขึ้น เช่น ผัก ไข่ หรือเครื่องปรุง
@@ -1652,13 +1653,13 @@ export default function MenuRecommendationsPage() {
         {recommendedMenus.map((menu) => (
           <article
             key={menu.id}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-2xl border border-slate-700 bg-slate-800/60 p-4 shadow-sm"
           >
             <div
               className={`aspect-[16/10] rounded-xl bg-gradient-to-br ${menu.imageClass} flex items-center justify-center relative overflow-hidden`}
             >
               <span className="text-6xl">{menu.emoji}</span>
-              <span className="absolute right-3 top-3 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">
+              <span className="absolute right-3 top-3 rounded-full bg-slate-900/70 px-2 py-1 text-xs font-semibold text-slate-300">
                 {menu.prep}
               </span>
               <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2 py-1 text-xs font-semibold text-white">
@@ -1667,7 +1668,7 @@ export default function MenuRecommendationsPage() {
               <button
                 type="button"
                 onClick={() => toggleLikeMenu(menu.id)}
-                className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border transition ${likedMenus.has(menu.id) ? "border-red-200 bg-red-100 text-red-500" : "border-white/60 bg-white/85 text-slate-500 hover:bg-white"}`}
+                className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border transition ${likedMenus.has(menu.id) ? "border-red-700/60 bg-red-900/40 text-red-400" : "border-slate-600/60 bg-slate-900/60 text-slate-400 hover:bg-slate-800"}`}
                 aria-label="favorite-menu"
                 title="เมนูโปรด"
               >
@@ -1677,13 +1678,13 @@ export default function MenuRecommendationsPage() {
                 />
               </button>
             </div>
-            <h2 className="mt-3 text-lg font-semibold text-slate-900">
+            <h2 className="mt-3 text-lg font-semibold text-slate-100">
               {menu.name}
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               {menu.calories} kcal · โปรตีน {menu.protein}g
             </p>
-            <p className="mt-1 text-xs text-emerald-700">
+            <p className="mt-1 text-xs text-emerald-400">
               วัตถุดิบที่มี: {menu.matchedKeywords.join(" • ")}
             </p>
             <button
@@ -1699,43 +1700,29 @@ export default function MenuRecommendationsPage() {
 
       {/* ── Cook confirm dialog ── */}
       {cookConfirmMenu && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-xs rounded-2xl bg-white p-6 shadow-2xl mx-4 text-center">
-            <span className="text-5xl block mb-3">{cookConfirmMenu.emoji}</span>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">{cookConfirmMenu.name}</h3>
-            <p className="text-sm text-slate-500 mb-5">เริ่มทำเมนูนี้เลยไหม? ใช้เวลาประมาณ {cookConfirmMenu.prep}</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setCookConfirmMenu(null)}
-                className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
-              >
-                ยังก่อน
-              </button>
-              <button
-                onClick={() => {
-                  recordCook(cookConfirmMenu.id, {
-                    name: cookConfirmMenu.name,
-                    emoji: cookConfirmMenu.emoji,
-                    img: cookConfirmMenu.recipeImage,
-                  });
-                  setSelectedMenu(cookConfirmMenu);
-                  setServings(2);
-                  setCookConfirmMenu(null);
-                }}
-                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
-              >
-                เริ่มทำเลย!
-              </button>
-            </div>
-          </div>
-        </div>
+        <CookConfirmDialog
+          emoji={cookConfirmMenu.emoji}
+          name={cookConfirmMenu.name}
+          time={cookConfirmMenu.prep}
+          onCancel={() => setCookConfirmMenu(null)}
+          onConfirm={() => {
+            recordCook(cookConfirmMenu.id, {
+              name: cookConfirmMenu.name,
+              emoji: cookConfirmMenu.emoji,
+              img: cookConfirmMenu.recipeImage,
+            });
+            setSelectedMenu(cookConfirmMenu);
+            setServings(2);
+            setCookConfirmMenu(null);
+          }}
+        />
       )}
 
       {selectedMenu && (
         <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/55 backdrop-blur-sm">
-          <div className="w-full max-w-4xl rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl max-h-[92vh] flex flex-col">
+          <div className="w-full max-w-4xl rounded-t-3xl sm:rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl max-h-[92vh] flex flex-col">
             {/* ── Header ── */}
-            <div className="flex flex-wrap items-center gap-4 px-6 py-4 border-b border-slate-100">
+            <div className="flex flex-wrap items-center gap-4 px-6 py-4 border-b border-slate-700">
               {/* recipe thumbnail */}
               <div
                 className={`h-16 w-16 shrink-0 rounded-xl bg-gradient-to-br ${selectedMenu.imageClass} flex items-center justify-center overflow-hidden`}
@@ -1753,7 +1740,7 @@ export default function MenuRecommendationsPage() {
               </div>
               {/* title + time */}
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-bold text-slate-900">
+                <h3 className="text-xl font-bold text-slate-100">
                   สูตร: {selectedMenu.name}
                 </h3>
                 <p className="text-sm text-slate-500 mt-0.5">
@@ -1785,28 +1772,28 @@ export default function MenuRecommendationsPage() {
                       <ellipse cx="23" cy="5.5" rx="2" ry="3.5" />
                       <line x1="23" y1="9" x2="23" y2="23" />
                     </svg>
-                    <span className="text-slate-600">ทำได้</span>
+                    <span className="text-slate-300">ทำได้</span>
                   </div>
                   <div className="flex items-center gap-2.5">
                     <button
                       type="button"
                       onClick={() => setServings((s) => Math.max(1, s - 1))}
-                      className="h-8 w-8 rounded-full border border-slate-300 bg-white text-slate-500 hover:bg-slate-50 hover:border-slate-400 flex items-center justify-center transition select-none"
+                      className="h-8 w-8 rounded-full border border-slate-600 bg-slate-700 text-slate-400 hover:bg-slate-600 hover:border-slate-500 flex items-center justify-center transition select-none"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
-                    <span className="w-5 text-center text-lg font-bold text-slate-900 tabular-nums">
+                    <span className="w-5 text-center text-lg font-bold text-slate-100 tabular-nums">
                       {servings}
                     </span>
                     <button
                       type="button"
                       onClick={() => setServings((s) => s + 1)}
-                      className="h-8 w-8 rounded-full border border-slate-300 bg-white text-slate-500 hover:bg-slate-50 hover:border-slate-400 flex items-center justify-center transition select-none"
+                      className="h-8 w-8 rounded-full border border-slate-600 bg-slate-700 text-slate-400 hover:bg-slate-600 hover:border-slate-500 flex items-center justify-center transition select-none"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <span className="text-sm text-slate-500">มื้อ</span>
+                  <span className="text-sm text-slate-400">มื้อ</span>
                 </div>
               </div>
               {/* heart + close */}
@@ -1814,7 +1801,7 @@ export default function MenuRecommendationsPage() {
                 <button
                   type="button"
                   onClick={() => toggleLikeMenu(selectedMenu.id)}
-                  className={`flex h-9 w-9 items-center justify-center rounded-full border transition ${likedMenus.has(selectedMenu.id) ? "border-red-200 bg-red-50 text-red-500" : "border-slate-200 bg-white text-slate-500 hover:bg-slate-100"}`}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border transition ${likedMenus.has(selectedMenu.id) ? "border-red-700/60 bg-red-900/40 text-red-400" : "border-slate-600 bg-slate-700 text-slate-400 hover:bg-slate-600"}`}
                   aria-label="favorite-menu-dialog"
                 >
                   <Heart
@@ -1827,7 +1814,7 @@ export default function MenuRecommendationsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedMenu(null)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-slate-400 hover:bg-slate-600 transition"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1839,14 +1826,14 @@ export default function MenuRecommendationsPage() {
               {/* two-column */}
               <div className="grid gap-4 lg:grid-cols-2">
                 {/* ── Left: Ingredients ── */}
-                <div className="rounded-2xl border border-emerald-100 bg-white overflow-hidden">
-                  <div className="bg-emerald-50 px-4 py-3 border-b border-emerald-100">
-                    <h4 className="font-semibold text-emerald-800">ส่วนผสม</h4>
+                <div className="rounded-2xl border border-emerald-800/60 bg-slate-800 overflow-hidden">
+                  <div className="bg-emerald-900/40 px-4 py-3 border-b border-emerald-800/60">
+                    <h4 className="font-semibold text-emerald-400">ส่วนผสม</h4>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-xs text-slate-500 border-b border-slate-100">
+                        <tr className="text-xs text-slate-500 border-b border-slate-700">
                           <th className="text-left font-medium px-4 py-2">
                             วัตถุดิบ
                           </th>
@@ -1861,7 +1848,7 @@ export default function MenuRecommendationsPage() {
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-50">
+                      <tbody className="divide-y divide-slate-700/50">
                         {selectedMenu.ingredients.map((ing) => {
                           const status = getIngredientStatus(
                             ing,
@@ -1870,18 +1857,18 @@ export default function MenuRecommendationsPage() {
                           );
                           const requiredAmt = (ing.required * servings) / 2;
                           return (
-                            <tr key={ing.name} className="hover:bg-slate-50">
+                            <tr key={ing.name} className="hover:bg-slate-700/30">
                               <td className="px-4 py-2.5">
                                 <div className="flex items-center gap-2">
-                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-base">
+                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-700 text-base">
                                     {ing.emoji}
                                   </span>
-                                  <span className="font-medium text-slate-800">
+                                  <span className="font-medium text-slate-200">
                                     {ing.name}
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-2 py-2.5 text-center text-slate-700">
+                              <td className="px-2 py-2.5 text-center text-slate-300">
                                 {requiredAmt % 1 === 0
                                   ? requiredAmt
                                   : requiredAmt.toFixed(1)}{" "}
@@ -1894,7 +1881,7 @@ export default function MenuRecommendationsPage() {
                               </td>
                               <td className="px-2 py-2.5 text-center">
                                 {status.enough ? (
-                                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mx-auto">
+                                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-900/60 text-emerald-400 mx-auto">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       className="h-3.5 w-3.5"
@@ -1909,7 +1896,7 @@ export default function MenuRecommendationsPage() {
                                     </svg>
                                   </span>
                                 ) : (
-                                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-500 mx-auto">
+                                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-900/50 text-red-400 mx-auto">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       className="h-3.5 w-3.5"
@@ -1936,10 +1923,10 @@ export default function MenuRecommendationsPage() {
                     (ing) =>
                       !getIngredientStatus(ing, pantryItems, servings).enough,
                   ) && (
-                    <div className="px-4 py-3 border-t border-slate-100">
+                    <div className="px-4 py-3 border-t border-slate-700">
                       <button
                         type="button"
-                        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-400 px-4 py-2.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-600/60 px-4 py-2.5 text-sm font-semibold text-emerald-400 hover:bg-emerald-900/30 transition"
                       >
                         <ShoppingCart className="h-4 w-4" />
                         สั่งซื้อวัตถุดิบที่ขาด
@@ -1949,13 +1936,13 @@ export default function MenuRecommendationsPage() {
                 </div>
 
                 {/* ── Right: Steps ── */}
-                <div className="rounded-2xl border border-slate-100 bg-slate-50 overflow-hidden">
-                  <div className="bg-sky-50 px-4 py-3 border-b border-sky-100">
-                    <h4 className="font-semibold text-sky-800">วิธีทำ</h4>
+                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 overflow-hidden">
+                  <div className="bg-sky-900/40 px-4 py-3 border-b border-sky-800/60">
+                    <h4 className="font-semibold text-sky-400">วิธีทำ</h4>
                   </div>
                   {/* Recipe image / emoji hero */}
                   {selectedMenu.recipeImage ? (
-                    <div className="h-44 w-full overflow-hidden bg-slate-100">
+                    <div className="h-44 w-full overflow-hidden bg-slate-700">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={selectedMenu.recipeImage}
@@ -1977,7 +1964,7 @@ export default function MenuRecommendationsPage() {
                       {selectedMenu.steps.map((step, idx) => (
                         <li
                           key={`${selectedMenu.id}-step-${idx}`}
-                          className="flex items-start gap-3 text-sm text-slate-700"
+                          className="flex items-start gap-3 text-sm text-slate-300"
                         >
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-sky-600 text-[11px] font-bold text-white mt-0.5">
                             {idx + 1}
@@ -1991,45 +1978,45 @@ export default function MenuRecommendationsPage() {
               </div>
 
               {/* ── Nutritional info ── */}
-              <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-5 py-4">
-                <p className="text-xs font-semibold text-emerald-700 mb-3 flex items-center gap-1.5">
+              <div className="rounded-xl border border-emerald-800/60 bg-emerald-900/30 px-5 py-4">
+                <p className="text-xs font-semibold text-emerald-400 mb-3 flex items-center gap-1.5">
                   <CircleCheckBig className="h-4 w-4" />
                   โภชนาการต่อ 1 มื้อ (โดยประมาณ)
                 </p>
-                <div className="grid grid-cols-4 divide-x divide-emerald-200 text-center">
+                <div className="grid grid-cols-4 divide-x divide-emerald-800/60 text-center">
                   <div className="px-2">
-                    <p className="text-base font-bold text-slate-900">
+                    <p className="text-base font-bold text-slate-100">
                       {selectedMenu.calories}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">kcal</p>
-                    <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                    <p className="text-xs text-slate-400 mt-0.5">kcal</p>
+                    <p className="text-[11px] text-emerald-400 font-medium mt-0.5">
                       พลังงาน
                     </p>
                   </div>
                   <div className="px-2">
-                    <p className="text-base font-bold text-slate-900">
+                    <p className="text-base font-bold text-slate-100">
                       {selectedMenu.protein}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">g</p>
-                    <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                    <p className="text-xs text-slate-400 mt-0.5">g</p>
+                    <p className="text-[11px] text-emerald-400 font-medium mt-0.5">
                       โปรตีน
                     </p>
                   </div>
                   <div className="px-2">
-                    <p className="text-base font-bold text-slate-900">
+                    <p className="text-base font-bold text-slate-100">
                       {selectedMenu.carbs}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">g</p>
-                    <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                    <p className="text-xs text-slate-400 mt-0.5">g</p>
+                    <p className="text-[11px] text-emerald-400 font-medium mt-0.5">
                       คาร์บ
                     </p>
                   </div>
                   <div className="px-2">
-                    <p className="text-base font-bold text-slate-900">
+                    <p className="text-base font-bold text-slate-100">
                       {selectedMenu.fat}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">g</p>
-                    <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                    <p className="text-xs text-slate-400 mt-0.5">g</p>
+                    <p className="text-[11px] text-emerald-400 font-medium mt-0.5">
                       ไขมัน
                     </p>
                   </div>
@@ -2038,10 +2025,10 @@ export default function MenuRecommendationsPage() {
 
               {/* ── Tip ── */}
               {selectedMenu.tip && (
-                <div className="rounded-xl border border-emerald-100 bg-green-50 px-4 py-3 flex items-start gap-2 text-sm text-slate-700">
-                  <Lightbulb className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+                <div className="rounded-xl border border-emerald-800/60 bg-emerald-900/30 px-4 py-3 flex items-start gap-2 text-sm text-slate-300">
+                  <Lightbulb className="h-4 w-4 shrink-0 text-emerald-400 mt-0.5" />
                   <p>
-                    <span className="font-semibold text-emerald-700">
+                    <span className="font-semibold text-emerald-400">
                       เคล็ดลับ:
                     </span>{" "}
                     {selectedMenu.tip}

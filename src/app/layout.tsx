@@ -23,6 +23,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="th" suppressHydrationWarning>
+      <head>
+        {/* Inline script: apply theme class BEFORE first paint to prevent FOUC */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=JSON.parse(localStorage.getItem('user_prefs')||'{}');var t=p.theme||'system';if(t==='dark'){document.documentElement.classList.add('dark');}else if(t==='light'){document.documentElement.classList.remove('dark');}else{if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={`${spaceGrotesk.variable} ${sarabun.variable} antialiased`}>
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>

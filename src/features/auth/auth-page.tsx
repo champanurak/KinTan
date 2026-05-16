@@ -49,7 +49,7 @@ function EyeIcon() {
 
 function BasketIcon() {
   return (
-    <svg className="h-5 w-5 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <svg className="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
       <path d="M5 10h14l-1.2 7.6a2 2 0 0 1-2 1.7H8.2a2 2 0 0 1-2-1.7L5 10Z" />
       <path d="m8 10 4-6 4 6" />
       <path d="M9.5 13.5h5" />
@@ -91,24 +91,24 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_20%_10%,#f4f7f2_0%,#ecefeb_32%,#e6e8e7_72%,#e2e5e4_100%)] px-4 py-8 text-slate-900 md:px-8 md:py-14">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_20%_10%,#0a1628_0%,#07111f_50%,#060e1a_100%)] px-4 py-8 text-slate-100 md:px-8 md:py-14">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-center">
-        <section className="grid w-full overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/95 shadow-[0_18px_60px_-25px_rgba(15,23,42,0.22)] backdrop-blur md:grid-cols-2">
-          <aside className="relative border-b border-emerald-100 bg-gradient-to-b from-emerald-50 to-emerald-100/60 p-8 md:border-b-0 md:border-r md:p-10">
+        <section className="grid w-full overflow-hidden rounded-[2rem] border border-slate-700/80 bg-slate-800/95 shadow-[0_18px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur md:grid-cols-2">
+          <aside className="relative border-b border-emerald-900/60 bg-gradient-to-b from-emerald-900/40 to-emerald-900/20 p-8 md:border-b-0 md:border-r md:p-10">
             <div className="mx-auto max-w-sm">
               <div className="inline-flex items-center gap-3">
-                <div className="grid h-14 w-14 place-items-center rounded-full bg-white shadow-sm ring-1 ring-emerald-200">
+                <div className="grid h-14 w-14 place-items-center rounded-full bg-slate-700 shadow-sm ring-1 ring-emerald-700">
                   <span className="text-3xl" aria-hidden="true">
                     🍊
                   </span>
                 </div>
                 <div>
-                  <h1 className="font-[family-name:var(--font-display)] text-[2rem] leading-none text-slate-900">Kin-Tan (กินทัน)</h1>
-                  <p className="mt-1 text-sm text-slate-600">จัดการของกิน ไม่ทิ้ง ไม่เสีย</p>
+                  <h1 className="font-[family-name:var(--font-display)] text-[2rem] leading-none text-slate-100">Kin-Tan (กินทัน)</h1>
+                  <p className="mt-1 text-sm text-slate-400">จัดการของกิน ไม่ทิ้ง ไม่เสีย</p>
                 </div>
               </div>
 
-              <p className="mt-8 max-w-xs text-3xl font-semibold leading-tight text-emerald-800">
+              <p className="mt-8 max-w-xs text-3xl font-semibold leading-tight text-emerald-300">
                 ลดของสูญเปล่า
                 <br />
                 เปลี่ยนขยะให้เป็นคุณค่า
@@ -117,13 +117,13 @@ export default function LoginPage() {
 
               <div className="mt-8 space-y-4">
                 {features.map((feature) => (
-                  <div key={feature.title} className="flex items-start gap-3 rounded-2xl bg-white/60 p-3 ring-1 ring-emerald-200/80">
-                    <div className="mt-0.5 grid h-9 w-9 place-items-center rounded-full bg-emerald-100">
+                  <div key={feature.title} className="flex items-start gap-3 rounded-2xl bg-slate-700/50 p-3 ring-1 ring-emerald-800/60">
+                    <div className="mt-0.5 grid h-9 w-9 place-items-center rounded-full bg-emerald-900/60">
                       <BasketIcon />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">{feature.title}</p>
-                      <p className="mt-0.5 text-sm text-slate-600">{feature.description}</p>
+                      <p className="font-medium text-slate-100">{feature.title}</p>
+                      <p className="mt-0.5 text-sm text-slate-400">{feature.description}</p>
                     </div>
                   </div>
                 ))}
@@ -137,13 +137,13 @@ export default function LoginPage() {
 
           <section className="p-8 md:p-10">
             <div className="mx-auto max-w-sm">
-              <h2 className="font-[family-name:var(--font-display)] text-5xl leading-none text-slate-900">เข้าสู่ระบบ</h2>
-              <p className="mt-2 text-base text-slate-500">ยินดีต้อนรับกลับมา 🌱</p>
+              <h2 className="font-[family-name:var(--font-display)] text-5xl leading-none text-slate-100">เข้าสู่ระบบ</h2>
+              <p className="mt-2 text-base text-slate-400">ยินดีต้อนรับกลับมา 🌱</p>
 
               <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">อีเมลหรือเบอร์โทรศัพท์</span>
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-100">
+                  <span className="mb-2 block text-sm font-medium text-slate-300">อีเมลหรือเบอร์โทรศัพท์</span>
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-600 bg-slate-700 px-3 py-3 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-900/50">
                     <MailIcon />
                     <input
                       type="text"
@@ -156,8 +156,8 @@ export default function LoginPage() {
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">รหัสผ่าน</span>
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-100">
+                  <span className="mb-2 block text-sm font-medium text-slate-300">รหัสผ่าน</span>
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-600 bg-slate-700 px-3 py-3 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-900/50">
                     <LockIcon />
                     <input
                       type={showPassword ? "text" : "password"}
@@ -178,11 +178,11 @@ export default function LoginPage() {
                 </label>
 
                 <div className="flex items-center justify-between gap-3 text-sm">
-                  <label className="inline-flex items-center gap-2 text-slate-500">
-                    <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                  <label className="inline-flex items-center gap-2 text-slate-400">
+                    <input type="checkbox" className="h-4 w-4 rounded border-slate-600 text-emerald-600 focus:ring-emerald-500" />
                     <span>จดจำฉัน</span>
                   </label>
-                  <button type="button" className="font-medium text-emerald-700 transition hover:text-emerald-800">
+                  <button type="button" className="font-medium text-emerald-400 transition hover:text-emerald-300">
                     ลืมรหัสผ่าน?
                   </button>
                 </div>
@@ -194,22 +194,22 @@ export default function LoginPage() {
                   เข้าสู่ระบบ
                 </button>
 
-                <div className="rounded-xl border border-emerald-200/80 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <div className="rounded-xl border border-emerald-800/60 bg-emerald-900/30 px-4 py-3 text-sm text-emerald-300">
                   Mock username: <span className="font-semibold">test@test.com</span>, password: <span className="font-semibold">1234</span>
                 </div>
 
                 {message ? (
-                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">{message}</div>
+                  <div className="rounded-xl border border-slate-700 bg-slate-700/50 px-4 py-3 text-sm text-slate-300">{message}</div>
                 ) : null}
 
-                <div className="relative py-1 text-center text-sm text-slate-400">
-                  <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-200" />
-                  <span className="relative bg-white px-3">หรือ</span>
+                <div className="relative py-1 text-center text-sm text-slate-500">
+                  <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-700" />
+                  <span className="relative bg-slate-800 px-3">หรือ</span>
                 </div>
 
                 <button
                   type="button"
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-base font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-700 text-base font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-600"
                 >
                   <span className="text-xl" aria-hidden="true">
                     G
@@ -217,8 +217,8 @@ export default function LoginPage() {
                   <span>เข้าสู่ระบบด้วย Google</span>
                 </button>
 
-                <p className="pt-1 text-center text-sm text-slate-500">
-                  ยังไม่มีบัญชีใช่ไหม? <button type="button" className="font-semibold text-emerald-700 hover:text-emerald-800">สมัครสมาชิก</button>
+                <p className="pt-1 text-center text-sm text-slate-400">
+                  ยังไม่มีบัญชีใช่ไหม? <button type="button" className="font-semibold text-emerald-400 hover:text-emerald-300">สมัครสมาชิก</button>
                 </p>
               </form>
             </div>

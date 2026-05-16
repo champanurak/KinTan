@@ -9,10 +9,10 @@ interface PantryItem {
   id: number;
   name: string;
   unit: string;
-  price: number;
+  price?: number;
   quantity: number;
   category: string;
-  createdAt: string;
+  createdAt?: string;
   expiresAt?: string;
 }
 
@@ -55,10 +55,10 @@ function expiryStatus(expiresAt?: string): "expired" | "soon" | "ok" | "none" {
 
 /* ─── Default categories ─── */
 const DEFAULT_CATEGORIES: Category[] = [
-  { name: "เนื้อสัตว์",     icon: "🥩", color: "bg-red-100 text-red-700 ring-red-200",     open: true },
-  { name: "นมและเนย",       icon: "🥛", color: "bg-blue-100 text-blue-700 ring-blue-200",   open: true },
-  { name: "เครื่องปรุง",    icon: "🧂", color: "bg-yellow-100 text-yellow-700 ring-yellow-200", open: true },
-  { name: "ของใช้ในบ้าน",   icon: "🏠", color: "bg-slate-100 text-slate-700 ring-slate-200",  open: true },
+  { name: "เนื้อสัตว์",     icon: "🥩", color: "bg-red-100 text-red-700 ring-red-200",     open: false },
+  { name: "นมและเนย",       icon: "🥛", color: "bg-blue-100 text-blue-700 ring-blue-200",   open: false },
+  { name: "เครื่องปรุง",    icon: "🧂", color: "bg-yellow-100 text-yellow-700 ring-yellow-200", open: false },
+  { name: "ของใช้ในบ้าน",   icon: "🏠", color: "bg-slate-100 text-slate-700 ring-slate-200",  open: false },
 ];
 
 const STORAGE_KEY_CATS = "pantry_categories";
@@ -83,7 +83,19 @@ export default function PantryPage() {
     try {
       const storedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
       if (storedItems) {
-        const parsed: PantryItem[] = JSON.parse(storedItems);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const raw: any[] = JSON.parse(storedItems);
+        // Migrate legacy format: expiryDate → expiresAt, string id → number
+        const parsed: PantryItem[] = raw.map(it => ({
+          id: Number(it.id) || Date.now() + Math.random(),
+          name: it.name ?? "",
+          unit: it.unit ?? "",
+          price: it.price != null ? Number(it.price) : undefined,
+          quantity: Number(it.quantity) || 0,
+          category: it.category ?? "อื่นๆ",
+          createdAt: it.createdAt ?? undefined,
+          expiresAt: it.expiresAt ?? it.expiryDate ?? undefined,
+        }));
         setItems(parsed);
         /* Auto-create categories for items that have an unregistered category */
         setCategories(prev => {
@@ -159,8 +171,8 @@ export default function PantryPage() {
       {/* Header row */}
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">รายการวัตถุดิบ</h2>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h2 className="text-xl font-semibold text-slate-100">รายการวัตถุดิบ</h2>
+          <p className="text-sm text-slate-400 mt-0.5">
             {categories.length} หมวดหมู่ · {totalItems} รายการทั้งหมด
           </p>
         </div>
@@ -178,27 +190,27 @@ export default function PantryPage() {
         {categories.map(cat => {
           const catItems = itemsFor(cat.name);
           return (
-            <div key={cat.name} className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div key={cat.name} className="rounded-2xl border border-slate-700 bg-slate-800/60 overflow-hidden shadow-sm">
               {/* Category header */}
-              <div className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition">
+              <div className="flex items-center justify-between px-5 py-4 hover:bg-slate-700/30 transition">
                 <button
                   onClick={() => toggleCategory(cat.name)}
                   className="flex flex-1 items-center gap-3 text-left"
                 >
                   <ChevronDown
-                    className={`h-5 w-5 text-slate-400 transition-transform duration-200 ${cat.open ? "rotate-180" : "-rotate-90"}`}
+                    className={`h-5 w-5 text-slate-500 transition-transform duration-200 ${cat.open ? "rotate-180" : "-rotate-90"}`}
                   />
                   <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg ring-1 ${cat.color}`}>
                     {cat.icon}
                   </span>
                   <div className="text-left">
-                    <p className="font-semibold text-slate-900">{cat.name}</p>
-                    <p className="text-xs text-slate-500">{catItems.length} รายการ</p>
+                    <p className="font-semibold text-slate-100">{cat.name}</p>
+                    <p className="text-xs text-slate-400">{catItems.length} รายการ</p>
                   </div>
                 </button>
                 <button
                   onClick={() => openDeleteDialog(cat.name)}
-                  className="ml-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition"
+                  className="ml-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-red-900/30 hover:text-red-400 transition"
                   title="ลบหมวดหมู่"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -207,14 +219,14 @@ export default function PantryPage() {
 
               {/* Collapsed content */}
               {cat.open && (
-                <div className="border-t border-slate-100 px-5 py-3">
+                <div className="border-t border-slate-700/60 px-5 py-3">
                   {catItems.length === 0 ? (
                     <p className="py-4 text-center text-sm text-slate-400">ยังไม่มีรายการในหมวดหมู่นี้</p>
                   ) : (
                     <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-xs text-slate-500 border-b border-slate-100">
+                        <tr className="text-xs text-slate-500 border-b border-slate-700">
                           <th className="py-2 text-left font-medium">ชื่อสินค้า</th>
                           <th className="py-2 text-center font-medium">จำนวน</th>
                           <th className="py-2 text-center font-medium">หน่วย</th>
@@ -231,13 +243,16 @@ export default function PantryPage() {
                             status === "soon"    ? "text-red-500 font-semibold" :
                             "text-slate-500";
                           return (
-                          <tr key={it.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
-                            <td className="py-2.5 font-medium text-slate-900">{it.name}</td>
-                            <td className="py-2.5 text-center font-semibold text-slate-900">{it.quantity}</td>
-                            <td className="py-2.5 text-center text-slate-600">{it.unit}</td>
-                            <td className="py-2.5 text-right font-semibold text-emerald-700">{it.price.toFixed(2)} ฿</td>
-                            <td className="py-2.5 text-right text-slate-500 text-xs">
-                              {new Date(it.createdAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })}
+                          <tr key={it.id} className="border-b border-slate-700/40 last:border-0 hover:bg-slate-700/30">
+                            <td className="py-2.5 font-medium text-slate-200">{it.name}</td>
+                            <td className="py-2.5 text-center font-semibold text-slate-200">{it.quantity}</td>
+                            <td className="py-2.5 text-center text-slate-400">{it.unit}</td>
+                            <td className="py-2.5 text-right font-semibold text-emerald-400">{it.price != null ? it.price.toFixed(2) : "\u2014"} ฿</td>
+                            <td className="py-2.5 text-right text-slate-400 text-xs">
+                              {it.createdAt
+                                ? new Date(it.createdAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })
+                                : <span className="text-slate-500">\u2014</span>
+                              }
                             </td>
                             <td className={`py-2.5 text-right text-xs ${expiryClass}`}>
                               {it.expiresAt
@@ -249,7 +264,7 @@ export default function PantryPage() {
                                     {new Date(it.expiresAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })}
                                   </span>
                                 )
-                                : <span className="text-slate-300">—</span>
+                                : <span className="text-slate-600">—</span>
                               }
                             </td>
                           </tr>
@@ -268,10 +283,10 @@ export default function PantryPage() {
 
       {/* Add Category Dialog */}
       {showDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl mx-4">
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">เพิ่มหมวดหมู่ใหม่</h3>
-            <p className="text-sm text-slate-500 mb-4">ระบุชื่อหมวดหมู่วัตถุดิบที่ต้องการเพิ่ม</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-xl mx-4">
+            <h3 className="text-lg font-semibold text-slate-100 mb-1">เพิ่มหมวดหมู่ใหม่</h3>
+            <p className="text-sm text-slate-400 mb-4">ระบุชื่อหมวดหมู่วัตถุดิบที่ต้องการเพิ่ม</p>
             <input
               ref={inputRef}
               type="text"
@@ -279,15 +294,15 @@ export default function PantryPage() {
               onChange={e => { setNewCatName(e.target.value); setDialogError(""); }}
               onKeyDown={e => e.key === "Enter" && handleSaveCategory()}
               placeholder="เช่น ผักสด, เครื่องดื่ม..."
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="w-full rounded-xl border border-slate-600 bg-slate-700 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
             {dialogError && (
-              <p className="mt-2 text-xs text-red-500">{dialogError}</p>
+              <p className="mt-2 text-xs text-red-400">{dialogError}</p>
             )}
             <div className="mt-5 flex gap-3">
               <button
                 onClick={() => setShowDialog(false)}
-                className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                className="flex-1 rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700 transition"
               >
                 ยกเลิก
               </button>
@@ -304,25 +319,25 @@ export default function PantryPage() {
 
       {/* Delete Category Dialog */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl mx-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
-              <Trash2 className="h-6 w-6 text-red-500" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-xl mx-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-900/40 mb-4">
+              <Trash2 className="h-6 w-6 text-red-400" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">ลบหมวดหมู่</h3>
-            <p className="text-sm text-slate-500 mb-1">ต้องการลบหมวดหมู่</p>
-            <p className="text-sm font-semibold text-slate-900 mb-4">&ldquo;{deleteTarget}&rdquo; ใช่หรือไม่?</p>
-            <p className="text-xs text-slate-400 mb-5">รายการสินค้าในหมวดหมู่นี้จะไม่ถูกลบ แต่จะไม่แสดงในหมวดนี้</p>
+            <h3 className="text-lg font-semibold text-slate-100 mb-1">ลบหมวดหมู่</h3>
+            <p className="text-sm text-slate-400 mb-1">ต้องการลบหมวดหมู่</p>
+            <p className="text-sm font-semibold text-slate-200 mb-4">&ldquo;{deleteTarget}&rdquo; ใช่หรือไม่?</p>
+            <p className="text-xs text-slate-500 mb-5">รายการสินค้าในหมวดหมู่นี้จะไม่ถูกลบ แต่จะไม่แสดงในหมวดนี้</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                className="flex-1 rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700 transition"
               >
                 ยกเลิก
               </button>
               <button
                 onClick={handleDeleteCategory}
-                className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-600 transition"
+                className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 transition"
               >
                 ลบหมวดหมู่
               </button>

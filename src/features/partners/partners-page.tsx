@@ -272,7 +272,7 @@ export default function PartnersPage() {
               className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 activeFilter === f.value
                   ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  : "border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 hover:bg-slate-700"
               }`}
             >
               {f.icon}
@@ -286,18 +286,18 @@ export default function PartnersPage() {
           <div className="relative">
             <button
               onClick={() => setSortOpen((p) => !p)}
-              className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+              className="flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-700"
             >
               เรียงตาม: {currentSortLabel}
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
             </button>
             {sortOpen && (
-              <div className="absolute right-0 top-full z-20 mt-1 min-w-[140px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+              <div className="absolute right-0 top-full z-20 mt-1 min-w-[140px] rounded-xl border border-slate-700 bg-slate-800 py-1 shadow-lg">
                 {SORT_OPTIONS.map((o) => (
                   <button
                     key={o.value}
                     onClick={() => { setSortOption(o.value); setSortOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-xs transition hover:bg-slate-50 ${sortOption === o.value ? "font-semibold text-emerald-600" : "text-slate-700"}`}
+                    className={`w-full px-4 py-2 text-left text-xs transition hover:bg-slate-700 ${sortOption === o.value ? "font-semibold text-emerald-400" : "text-slate-300"}`}
                   >
                     {o.label}
                   </button>
@@ -310,7 +310,7 @@ export default function PartnersPage() {
 
       {/* Partner grid */}
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-12 text-center">
+        <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-12 text-center">
           <p className="text-slate-400">ไม่พบร้านค้าในหมวดหมู่นี้</p>
         </div>
       ) : (
@@ -318,12 +318,12 @@ export default function PartnersPage() {
           {filtered.map((partner) => (
             <article
               key={partner.id}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+              className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/60 shadow-sm transition hover:shadow-lg"
             >
               {/* Card header */}
               <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-700 bg-slate-700">
                     {brokenLogos.has(partner.id) ? (
                       <span className={`flex h-full w-full items-center justify-center rounded-xl text-xs font-bold ${partner.fallbackClass}`}>
                         {partner.fallbackInitial}
@@ -339,9 +339,9 @@ export default function PartnersPage() {
                       />
                     )}
                   </div>
-                  <span className="text-base font-bold text-slate-900">{partner.name}</span>
+                  <span className="text-base font-bold text-slate-100">{partner.name}</span>
                 </div>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                <span className="rounded-full border border-slate-700 bg-slate-700/50 px-2 py-0.5 text-[11px] font-medium text-slate-400">
                   {partner.categoryLabel}
                 </span>
               </div>
@@ -383,7 +383,7 @@ export default function PartnersPage() {
               <div className="flex gap-2 px-3 pb-3">
                 <button
                   onClick={() => setBranchOpen(partner.id)}
-                  className="flex-1 rounded-xl border border-slate-200 py-2 text-center text-[12px] font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="flex-1 rounded-xl border border-slate-600 py-2 text-center text-[12px] font-medium text-slate-300 transition hover:bg-slate-700"
                 >
                   ดูสาขา
                 </button>
@@ -398,16 +398,16 @@ export default function PartnersPage() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2">
-                <span className="flex items-center gap-1 text-[11px] text-slate-500">
-                  <Truck className="h-3 w-3 text-emerald-500" />
+              <div className="flex items-center justify-between border-t border-slate-700/60 px-4 py-2">
+                <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                  <Truck className="h-3 w-3 text-emerald-400" />
                   จัดส่งฟรีเมื่อครบ {partner.deliveryMin.toLocaleString()} บาท
                 </span>
-                <span className="flex items-center gap-1 text-[11px] text-slate-500">
-                  <Navigation className="h-3 w-3 text-slate-400" />
+                <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                  <Navigation className="h-3 w-3 text-slate-500" />
                   {getBranchDistance(partner)} กม.
                   {(selectedBranchIdx[partner.id] ?? 0) > 0 && (
-                    <span className="text-emerald-600 font-medium">• {partner.branches[selectedBranchIdx[partner.id]].name}</span>
+                    <span className="text-emerald-400 font-medium">• {partner.branches[selectedBranchIdx[partner.id]].name}</span>
                   )}
                 </span>
               </div>
@@ -417,14 +417,14 @@ export default function PartnersPage() {
       )}
 
       {/* Bottom banner */}
-      <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-green-50 p-5">
+      <div className="overflow-hidden rounded-2xl border border-emerald-800/60 bg-gradient-to-r from-emerald-950/80 via-emerald-900/40 to-green-950/60 p-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="flex items-center gap-2 text-base font-bold text-emerald-800">
+            <p className="flex items-center gap-2 text-base font-bold text-emerald-400">
               <span className="text-xl">🌿</span>
               ประหยัด คุ้มค่า ไม่ทิ้งอาหาร
             </p>
-            <p className="mt-1 max-w-sm text-xs text-emerald-700">
+            <p className="mt-1 max-w-sm text-xs text-emerald-400/80">
               ใช้โปรโมชั่นอย่างชาญฉลาด ช่วยประหยัดค่าใช้จ่าย และลดการสูญเสียอาหารไปพร้อมกัน
             </p>
           </div>
@@ -446,19 +446,19 @@ export default function PartnersPage() {
         const currentIdx = selectedBranchIdx[p.id] ?? 0;
         return (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="w-full max-w-sm rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
                 <div>
                   <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wide">เลือกสาขา</p>
-                  <h3 className="text-base font-bold text-slate-900">{p.name}</h3>
+                  <h3 className="text-base font-bold text-slate-100">{p.name}</h3>
                 </div>
-                <button onClick={() => setBranchOpen(null)} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-slate-100 text-slate-500">
+                <button onClick={() => setBranchOpen(null)} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-slate-700 text-slate-400">
                   ✕
                 </button>
               </div>
               {/* Branch list */}
-              <ul className="max-h-72 overflow-y-auto divide-y divide-slate-50">
+              <ul className="max-h-72 overflow-y-auto divide-y divide-slate-700/60">
                 {p.branches.map((b, i) => (
                   <li key={i}>
                     <button
@@ -466,18 +466,18 @@ export default function PartnersPage() {
                         setSelectedBranchIdx(prev => ({ ...prev, [p.id]: i }));
                         setBranchOpen(null);
                       }}
-                      className={`w-full flex items-center gap-3 px-5 py-3.5 text-left transition hover:bg-slate-50 ${i === currentIdx ? "bg-emerald-50" : ""}`}
+                      className={`w-full flex items-center gap-3 px-5 py-3.5 text-left transition hover:bg-slate-700/50 ${i === currentIdx ? "bg-emerald-900/30" : ""}`}
                     >
-                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${i === currentIdx ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-500"}`}>
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${i === currentIdx ? "bg-emerald-500 text-white" : "bg-slate-700 text-slate-400"}`}>
                         {i === currentIdx ? "✓" : i + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold truncate ${i === currentIdx ? "text-emerald-700" : "text-slate-800"}`}>{b.name}</p>
-                        <p className="text-[11px] text-slate-400 truncate">{b.address}</p>
-                        <p className="text-[11px] text-slate-400">{b.hours}</p>
+                        <p className={`text-sm font-semibold truncate ${i === currentIdx ? "text-emerald-400" : "text-slate-200"}`}>{b.name}</p>
+                        <p className="text-[11px] text-slate-500 truncate">{b.address}</p>
+                        <p className="text-[11px] text-slate-500">{b.hours}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className={`text-sm font-bold ${i === currentIdx ? "text-emerald-600" : "text-slate-600"}`}>{b.distance} กม.</p>
+                        <p className={`text-sm font-bold ${i === currentIdx ? "text-emerald-400" : "text-slate-400"}`}>{b.distance} กม.</p>
                       </div>
                     </button>
                   </li>
@@ -491,9 +491,9 @@ export default function PartnersPage() {
       {/* Info modal */}
       {infoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="mb-3 text-base font-bold text-slate-900">วิธีใช้และสิทธิประโยชน์</h3>
-            <ul className="space-y-2 text-sm text-slate-600">
+          <div className="w-full max-w-sm rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-2xl">
+            <h3 className="mb-3 text-base font-bold text-slate-100">วิธีใช้และสิทธิประโยชน์</h3>
+            <ul className="space-y-2 text-sm text-slate-400">
               <li className="flex gap-2"><span className="text-emerald-500">✓</span>เลือกฟิลเตอร์เพื่อดูร้านค้าตามประเภทที่ต้องการ</li>
               <li className="flex gap-2"><span className="text-emerald-500">✓</span>กด &ldquo;ไปที่ร้านค้า&rdquo; เพื่อเปิดเว็บไซต์และรับโปรโมชั่น</li>
               <li className="flex gap-2"><span className="text-emerald-500">✓</span>โปรโมชั่นมีวันหมดอายุ ควรใช้ก่อนวันที่ระบุ</li>
