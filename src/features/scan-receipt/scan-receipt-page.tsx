@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo, Fragment, useEffect } from "react";
-import { Camera, ImageIcon, Filter, Check, Plus, FileText, X, Loader2, ScanLine, Sun, AlignCenter, Store, Lock, RefreshCw, MoreVertical, ChevronDown, Trash2, Pencil } from "lucide-react";
+import { Camera, ImageIcon, Check, Plus, FileText, X, Loader2, ScanLine, Sun, AlignCenter, Store, Lock, RefreshCw, MoreVertical, ChevronDown, Trash2, Pencil } from "lucide-react";
 import Image from "next/image";
 import AppShell from "@/components/layout/app-shell";
 import { usePantryStore, type PantryCategory } from "@/store/pantry-store";
@@ -172,15 +172,6 @@ export default function ScanReceiptPage() {
   const updateItemQuantity = (id: number, quantity: number) => {
     if (quantity < 1) return;
     setItems(items.map((item) => (item.id === id ? { ...item, quantity } : item)));
-  };
-
-  const updateItemCategory = (id: number, category: string) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, category } : item)));
-  };
-
-  const handleAddMoreReceipts = () => {
-    setIsAddingMoreReceipts(true);
-    cameraInputRef.current?.click();
   };
 
   // ── Step 2 helpers ──────────────────────────────────────

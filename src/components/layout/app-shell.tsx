@@ -13,7 +13,6 @@ import {
   ShoppingCart,
   BarChart2,
   Settings,
-  Search,
   MessageCircle,
   ChevronDown,
   MoreHorizontal,

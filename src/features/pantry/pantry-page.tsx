@@ -3,10 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Plus, ChevronDown, Trash2, TriangleAlert } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
-import { usePantryStore, type PantryItem, type PantryCategory } from "@/store/pantry-store";
-
-/* ─── Type alias (for local backwards compat) ─── */
-type Category = PantryCategory;
+import { usePantryStore } from "@/store/pantry-store";
 
 /* ─── Preset icons / colors per keyword ─── */
 const CATEGORY_PRESETS: Record<string, { icon: string; color: string }> = {

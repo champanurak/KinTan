@@ -32,7 +32,6 @@ function buildSystemPrompt(ctx?: PantryContext): string {
 
   if (!ctx?.items?.length) return base;
 
-  const now = new Date();
   const userName = ctx.userName ? `\nชื่อผู้ใช้: ${ctx.userName}` : "";
 
   const expiring = ctx.items

@@ -15,21 +15,6 @@ interface Message {
   ts: number;
 }
 
-interface PantryItem {
-  id: number;
-  name: string;
-  unit: string;
-  price?: number;
-  quantity: number;
-  category: string;
-  expiresAt?: string;
-}
-
-interface PantryContext {
-  items?: PantryItem[];
-  userName?: string;
-}
-
 /* ── Suggestions ── */
 const SUGGESTIONS = [
   "มีอะไรใกล้หมดอายุบ้าง?",

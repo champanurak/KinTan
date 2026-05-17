@@ -11,7 +11,7 @@ import {
   UploadCloud, RefreshCw, Trash2,
   Scale, FlaskConical, Thermometer,
   ChevronRight, ExternalLink,
-  Sun, Moon, Monitor, HelpCircle,
+  Sun, Moon, HelpCircle,
 } from "lucide-react";
 import { useForm, Controller, useWatch, type Control } from "react-hook-form";
 import { TextInput } from "@/components/ui/text-input";
