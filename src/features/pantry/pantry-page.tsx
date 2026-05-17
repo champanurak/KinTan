@@ -3,25 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Plus, ChevronDown, Trash2, TriangleAlert } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
+import { usePantryStore, type PantryItem, type PantryCategory } from "@/store/pantry-store";
 
-/* ─── Types ─── */
-interface PantryItem {
-  id: number;
-  name: string;
-  unit: string;
-  price?: number;
-  quantity: number;
-  category: string;
-  createdAt?: string;
-  expiresAt?: string;
-}
-
-interface Category {
-  name: string;
-  icon: string;
-  color: string;
-  open: boolean;
-}
+/* ─── Type alias (for local backwards compat) ─── */
+type Category = PantryCategory;
 
 /* ─── Preset icons / colors per keyword ─── */
 const CATEGORY_PRESETS: Record<string, { icon: string; color: string }> = {
@@ -53,78 +38,28 @@ function expiryStatus(expiresAt?: string): "expired" | "soon" | "ok" | "none" {
   return "ok";
 }
 
-/* ─── Default categories ─── */
-const DEFAULT_CATEGORIES: Category[] = [
-  { name: "เนื้อสัตว์",     icon: "🥩", color: "bg-red-100 text-red-700 ring-red-200",     open: false },
-  { name: "นมและเนย",       icon: "🥛", color: "bg-blue-100 text-blue-700 ring-blue-200",   open: false },
-  { name: "เครื่องปรุง",    icon: "🧂", color: "bg-yellow-100 text-yellow-700 ring-yellow-200", open: false },
-  { name: "ของใช้ในบ้าน",   icon: "🏠", color: "bg-slate-100 text-slate-700 ring-slate-200",  open: false },
-];
-
-const STORAGE_KEY_CATS = "pantry_categories";
-const STORAGE_KEY_ITEMS = "pantry_items";
 
 export default function PantryPage() {
-  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
-  const [items, setItems] = useState<PantryItem[]>([]);
+  const { categories, items, addCategory, removeCategory, toggleCategory } = usePantryStore();
   const [showDialog, setShowDialog] = useState(false);
   const [newCatName, setNewCatName] = useState("");
   const [dialogError, setDialogError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  /* load from localStorage */
+  /* Auto-create categories for items that have an unregistered category */
   useEffect(() => {
-    try {
-      const storedCats = localStorage.getItem(STORAGE_KEY_CATS);
-      if (storedCats) setCategories(JSON.parse(storedCats));
-    } catch {}
-
-    try {
-      const storedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
-      if (storedItems) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const raw: any[] = JSON.parse(storedItems);
-        // Migrate legacy format: expiryDate → expiresAt, string id → number
-        const parsed: PantryItem[] = raw.map(it => ({
-          id: Number(it.id) || Date.now() + Math.random(),
-          name: it.name ?? "",
-          unit: it.unit ?? "",
-          price: it.price != null ? Number(it.price) : undefined,
-          quantity: Number(it.quantity) || 0,
-          category: it.category ?? "อื่นๆ",
-          createdAt: it.createdAt ?? undefined,
-          expiresAt: it.expiresAt ?? it.expiryDate ?? undefined,
-        }));
-        setItems(parsed);
-        /* Auto-create categories for items that have an unregistered category */
-        setCategories(prev => {
-          const names = new Set(prev.map(c => c.name));
-          const extra: Category[] = [];
-          parsed.forEach(it => {
-            if (it.category && !names.has(it.category)) {
-              names.add(it.category);
-              const p = presetFor(it.category);
-              extra.push({ name: it.category, icon: p.icon, color: p.color, open: true });
-            }
-          });
-          return extra.length ? [...prev, ...extra] : prev;
-        });
+    const state = usePantryStore.getState();
+    const catNames = new Set(state.categories.map(c => c.name));
+    items.forEach(it => {
+      if (it.category && !catNames.has(it.category)) {
+        catNames.add(it.category);
+        const p = presetFor(it.category);
+        state.addCategory({ name: it.category, icon: p.icon, color: p.color, open: true });
       }
-    } catch {}
-  }, []);
-
-  /* persist categories */
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_CATS, JSON.stringify(categories));
-  }, [categories]);
-
-  /* toggle collapse */
-  function toggleCategory(name: string) {
-    setCategories(prev =>
-      prev.map(c => c.name === name ? { ...c, open: !c.open } : c)
-    );
-  }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
 
   /* open dialog */
   function openAddDialog() {
@@ -143,7 +78,7 @@ export default function PantryPage() {
       return;
     }
     const p = presetFor(trimmed);
-    setCategories(prev => [...prev, { name: trimmed, icon: p.icon, color: p.color, open: true }]);
+    addCategory({ name: trimmed, icon: p.icon, color: p.color, open: true });
     setShowDialog(false);
   }
 
@@ -154,7 +89,7 @@ export default function PantryPage() {
 
   function handleDeleteCategory() {
     if (!deleteTarget) return;
-    setCategories(prev => prev.filter(c => c.name !== deleteTarget));
+    removeCategory(deleteTarget);
     setDeleteTarget(null);
   }
 

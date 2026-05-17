@@ -3,6 +3,8 @@ export type ReceiptItem = {
   category: string;
   price: number;
   confidence: number;
+  quantity?: number;
+  unit?: string;
   suggestedStores?: string[];
 };
 

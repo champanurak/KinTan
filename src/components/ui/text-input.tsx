@@ -22,6 +22,7 @@ export function TextInput({
   unit,
   error,
   className,
+  disabled,
   ...rest
 }: TextInputProps) {
   return (
@@ -29,13 +30,18 @@ export function TextInput({
       {label && (
         <label className="mb-1 block text-xs text-slate-400">{label}</label>
       )}
-      <div className={`flex items-center gap-2 rounded-xl border bg-slate-700 px-3 py-2.5 transition focus-within:border-emerald-400 ${
+      <div className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 transition ${
+        disabled
+          ? "input-disabled cursor-not-allowed"
+          : "bg-slate-700 focus-within:border-emerald-400"
+      } ${
         error ? "border-red-500" : "border-slate-600"
       }`}>
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500"
+          disabled={disabled}
+          className="w-full bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500 disabled:cursor-not-allowed"
           {...rest}
         />
         {unit && (

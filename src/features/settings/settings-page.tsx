@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/app-shell";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
+import { useUserStore } from "@/store/user-store";
 import {
   Bell, Clock, Tag, BarChart2,
   UploadCloud, RefreshCw, Trash2,
@@ -53,6 +54,8 @@ export default function SettingsPage() {
   const [prefsSaved, setPrefsSaved]   = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { profile: storeProfile, prefs: storePrefs, setProfile, setPrefs: setStorePrefs } = useUserStore();
+
   // Synchronous — no extra state/effect needed; "use client" always runs in browser
   const resolvedTheme: "light" | "dark" = theme === "dark" ? "dark" : "light";
 
@@ -79,32 +82,24 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
-    const raw = localStorage.getItem("user_profile");
-    if (!raw) return;
-    try {
-      const p = JSON.parse(raw);
-      profileReset({
-        name:  p.name  || "test",
-        email: p.email || "test@example.com",
-        phone: p.phone || "081-234-5678",
-      });
-      if (p.avatarDataUrl) setAvatarDataUrl(p.avatarDataUrl);
-    } catch {}
-  }, [profileReset]);
+    profileReset({
+      name:  storeProfile.name,
+      email: storeProfile.email,
+      phone: storeProfile.phone,
+    });
+    if (storeProfile.avatarDataUrl) setAvatarDataUrl(storeProfile.avatarDataUrl);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeProfile.name, storeProfile.email, storeProfile.phone, storeProfile.avatarDataUrl]);
 
   useEffect(() => {
-    const raw = localStorage.getItem("user_prefs");
-    if (!raw) return;
-    try {
-      const p = JSON.parse(raw);
-      prefsReset({
-        language:   p.language   || "ภาษาไทย",
-        currency:   p.currency   || "บาท (฿)",
-        dateFormat: p.dateFormat || "วันที่ 9 ม.ค. 2567",
-        timezone:   p.timezone   || "(GMT+07:00) กรุงเทพฯ",
-      });
-    } catch {}
-  }, [prefsReset]);
+    prefsReset({
+      language:   storePrefs.language,
+      currency:   storePrefs.currency,
+      dateFormat: storePrefs.dateFormat,
+      timezone:   storePrefs.timezone,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storePrefs.language, storePrefs.currency, storePrefs.dateFormat, storePrefs.timezone]);
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -117,17 +112,13 @@ export default function SettingsPage() {
   }
 
   function onSaveProfile(data: ProfileForm) {
-    const profile = { ...data, avatarDataUrl };
-    localStorage.setItem("user_profile", JSON.stringify(profile));
-    window.dispatchEvent(new Event("profile_updated"));
+    setProfile({ ...data, avatarDataUrl });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
 
   function onSavePrefs(data: PrefsForm) {
-    const prefs = { ...data, theme };
-    localStorage.setItem("user_prefs", JSON.stringify(prefs));
-    window.dispatchEvent(new Event("prefs_updated"));
+    setStorePrefs({ ...data });
     setPrefsSaved(true);
     setTimeout(() => setPrefsSaved(false), 2000);
   }

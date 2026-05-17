@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
+import { useUserStore } from "@/store/user-store";
 
 export type Theme = "light" | "dark" | "system";
 
@@ -12,20 +13,14 @@ interface ThemeContextType {
 const ThemeCtx = createContext<ThemeContextType>({ theme: "system", setTheme: () => {} });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system");
+  const theme = useUserStore((s) => s.prefs.theme);
+  const setStorePrefs = useUserStore((s) => s.setPrefs);
 
-  // Load saved theme on mount
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("user_prefs");
-      if (raw) {
-        const p = JSON.parse(raw);
-        if (p.theme) setThemeState(p.theme as Theme);
-      }
-    } catch {}
-  }, []);
+  function setTheme(t: Theme) {
+    setStorePrefs({ theme: t });
+  }
 
-  // Apply theme to <html> whenever theme changes
+  // Apply theme class to <html> whenever theme changes
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "dark") {
@@ -39,23 +34,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  // Re-sync when prefs are saved from settings page
-  useEffect(() => {
-    function onPrefsUpdated() {
-      try {
-        const raw = localStorage.getItem("user_prefs");
-        if (raw) {
-          const p = JSON.parse(raw);
-          if (p.theme) setThemeState(p.theme as Theme);
-        }
-      } catch {}
-    }
-    window.addEventListener("prefs_updated", onPrefsUpdated);
-    return () => window.removeEventListener("prefs_updated", onPrefsUpdated);
-  }, []);
-
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme: setThemeState }}>
+    <ThemeCtx.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeCtx.Provider>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -20,6 +20,46 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
+import { useUserStore } from "@/store/user-store";
+import { usePantryStore } from "@/store/pantry-store";
+
+const THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+
+function formatThaiDate(isoDate: string): string {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  return `${d} ${THAI_MONTHS[m - 1]} ${y + 543}`;
+}
+
+function daysUntilExpiry(isoDate: string): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(isoDate + "T00:00:00");
+  target.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - today.getTime()) / 86400000);
+}
+
+function pantryItemEmoji(name: string, category: string): string {
+  if (name.includes("ไก่")) return "🍗";
+  if (name.includes("หมู")) return "🥩";
+  if (name.includes("วัว") || name.includes("เนื้อ")) return "🥩";
+  if (name.includes("ปลา")) return "🐟";
+  if (name.includes("นม")) return "🥛";
+  if (name.includes("ไข่")) return "🥚";
+  if (name.includes("ผัก")) return "🥬";
+  const CAT: Record<string, string> = {
+    "เนื้อสัตว์": "🥩", "ผักและผลไม้": "🥦", "นมและเนย": "🥛",
+    "เครื่องปรุง": "🧂", "เครื่องดื่ม": "🥤", "อาหารแช่แข็ง": "🧧",
+  };
+  return CAT[category] ?? "📦";
+}
+
+function expiryBadgeCfg(daysLeft: number) {
+  if (daysLeft <= 1) return { bg: "bg-red-50",    badge: "bg-red-100 text-red-600",    expClass: "text-red-500" };
+  if (daysLeft <= 2) return { bg: "bg-orange-50", badge: "bg-orange-100 text-orange-600", expClass: "text-orange-500" };
+  if (daysLeft <= 3) return { bg: "bg-amber-50",  badge: "bg-amber-100 text-amber-600",  expClass: "text-amber-500" };
+  if (daysLeft <= 5) return { bg: "bg-yellow-50", badge: "bg-yellow-100 text-yellow-600", expClass: "text-yellow-600" };
+  return                     { bg: "bg-slate-50",  badge: "bg-green-100 text-green-600",  expClass: "text-green-600" };
+}
 
 type NavItem = { href: string; label: string; icon: React.ReactNode };
 type AppShellProps = {
@@ -67,6 +107,11 @@ const navItems: NavItem[] = [
     icon: <BarChart2 className="h-4 w-4" />,
   },
   {
+    href: "/ai-chat",
+    label: "ผู้ช่วย AI",
+    icon: <MessageCircle className="h-4 w-4" />,
+  },
+  {
     href: "/settings",
     label: "ตั้งค่า",
     icon: <Settings className="h-4 w-4" />,
@@ -95,82 +140,41 @@ export default function AppShell({
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [profile, setProfile] = useState<{
-    name?: string;
-    email?: string;
-    avatarDataUrl?: string;
-  } | null>(null);
 
-  useEffect(() => {
-    function loadProfile() {
-      const raw = localStorage.getItem("user_profile");
-      if (!raw) return;
-      try {
-        setProfile(JSON.parse(raw));
-      } catch {}
-    }
-    loadProfile();
-    window.addEventListener("profile_updated", loadProfile);
-    return () => window.removeEventListener("profile_updated", loadProfile);
-  }, []);
+  const profile = useUserStore((s) => s.profile);
+  const pantryItems = usePantryStore((s) => s.items);
 
-  const notifItems = [
-    {
-      emoji: "🥩",
-      bg: "bg-red-50",
-      name: "เนื้อสันในวัว",
-      code: "RM-001",
-      qty: "2.5 กก.",
-      daysLeft: 1,
-      expiry: "17 พ.ค. 2569",
-      badge: "bg-red-100 text-red-600",
-      expClass: "text-red-500",
-    },
-    {
-      emoji: "🥛",
-      bg: "bg-blue-50",
-      name: "นมสดพาสเจอร์ไรส์",
-      code: "DA-004",
-      qty: "3 ขวด",
-      daysLeft: 2,
-      expiry: "18 พ.ค. 2569",
-      badge: "bg-orange-100 text-orange-600",
-      expClass: "text-orange-500",
-    },
-    {
-      emoji: "🥚",
-      bg: "bg-amber-50",
-      name: "ไข่ไก่ เบอร์ 2",
-      code: "EG-002",
-      qty: "20 ฟอง",
-      daysLeft: 3,
-      expiry: "19 พ.ค. 2569",
-      badge: "bg-amber-100 text-amber-600",
-      expClass: "text-amber-500",
-    },
-    {
-      emoji: "🌾",
-      bg: "bg-yellow-50",
-      name: "แป้งสาลีเนกประสงค์",
-      code: "ING-010",
-      qty: "1.2 กก.",
-      daysLeft: 5,
-      expiry: "21 พ.ค. 2569",
-      badge: "bg-yellow-100 text-yellow-600",
-      expClass: "text-yellow-600",
-    },
-    {
-      emoji: "🫙",
-      bg: "bg-slate-50",
-      name: "ซอสหอยนางรม",
-      code: "ING-015",
-      qty: "1 ขวด",
-      daysLeft: 7,
-      expiry: "23 พ.ค. 2569",
-      badge: "bg-green-100 text-green-600",
-      expClass: "text-green-600",
-    },
+  const HARDCODED_NOTIF = [
+    { emoji: "🥩", bg: "bg-red-50",    name: "เนื้อสันในวัว",          code: "RM-001",  qty: "2.5 กก.",  daysLeft: 1, expiry: "17 พ.ค. 2569", badge: "bg-red-100 text-red-600",    expClass: "text-red-500" },
+    { emoji: "🥛", bg: "bg-blue-50",   name: "นมสดพาสเจอร์ไรส์",       code: "DA-004",  qty: "3 ขวด",    daysLeft: 2, expiry: "18 พ.ค. 2569", badge: "bg-orange-100 text-orange-600", expClass: "text-orange-500" },
+    { emoji: "🥚", bg: "bg-amber-50",  name: "ไข่ไก่ เบอร์ 2",          code: "EG-002",  qty: "20 ฟอง",   daysLeft: 3, expiry: "19 พ.ค. 2569", badge: "bg-amber-100 text-amber-600",  expClass: "text-amber-500" },
+    { emoji: "🌾", bg: "bg-yellow-50", name: "แป้งสาลีเนกประสงค์",      code: "ING-010", qty: "1.2 กก.",  daysLeft: 5, expiry: "21 พ.ค. 2569", badge: "bg-yellow-100 text-yellow-600", expClass: "text-yellow-600" },
+    { emoji: "🫙", bg: "bg-slate-50",  name: "ซอสหอยนางรม",             code: "ING-015", qty: "1 ขวด",    daysLeft: 7, expiry: "23 พ.ค. 2569", badge: "bg-green-100 text-green-600",  expClass: "text-green-600" },
   ];
+
+  const notifItems = useMemo(() => {
+    const dynamic = pantryItems
+      .filter((item) => item.alertExpiry && item.expiresAt)
+      .map((item) => {
+        const daysLeft = daysUntilExpiry(item.expiresAt!);
+        const cfg = expiryBadgeCfg(daysLeft);
+        return {
+          emoji: pantryItemEmoji(item.name, item.category),
+          bg: cfg.bg,
+          name: item.name,
+          code: "",
+          qty: `${item.quantity} ${item.unit}`,
+          daysLeft,
+          expiry: formatThaiDate(item.expiresAt!),
+          badge: cfg.badge,
+          expClass: cfg.expClass,
+        };
+      })
+      .filter((item) => item.daysLeft <= 7)
+      .sort((a, b) => a.daysLeft - b.daysLeft);
+    return dynamic.length > 0 ? dynamic : HARDCODED_NOTIF;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pantryItems]);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -216,7 +220,7 @@ export default function AppShell({
           >
             <Bell className="h-4 w-4" />
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
-              3
+              {notifItems.length}
             </span>
           </button>
           <a
@@ -357,18 +361,17 @@ export default function AppShell({
               >
                 <Bell className="h-5 w-5" />
                 <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  3
+                  {notifItems.length}
                 </span>
               </button>
-              <a
-                href="https://chatgpt.com"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => router.push("/ai-chat")}
                 className="flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span className="hidden lg:inline">ผู้ช่วย AI</span>
-              </a>
+              </button>
               <div className="relative" ref={userMenuRef}>
                 <button
                   type="button"

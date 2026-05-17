@@ -177,14 +177,20 @@ html:not(.dark) .hover\:bg-slate-600:hover {
 }
 
 /* ── Form elements ── */
-html:not(.dark) input[type="text"],
-html:not(.dark) input[type="email"],
-html:not(.dark) input[type="tel"],
-html:not(.dark) input[type="number"],
-html:not(.dark) input:not([type]) {
+html:not(.dark) input[type="text"]:not(:disabled),
+html:not(.dark) input[type="email"]:not(:disabled),
+html:not(.dark) input[type="tel"]:not(:disabled),
+html:not(.dark) input[type="number"]:not(:disabled),
+html:not(.dark) input:not([type]):not(:disabled) {
   color: #0f172a !important;
   background-color: #ffffff !important;
   border-color: #e5e7eb !important;
+}
+
+/* Disabled inputs: transparent so the wrapper's gray bg shows through */
+html:not(.dark) input:disabled {
+  background-color: transparent !important;
+  color: #94a3b8 !important;
 }
 
 /* SelectInput: compound selector (0,2,2) beats .bg-slate-700 alone (0,2,1) */
@@ -194,10 +200,15 @@ html:not(.dark) select.bg-slate-700 {
   border-color: #e5e7eb !important;
 }
 
-/* TextInput wrapper (has bg-slate-700 + focus-within:border-emerald-400 together) → white */
+/* TextInput wrapper in light mode: white bg, gray border idle, emerald on focus */
 html:not(.dark) .bg-slate-700.focus-within\:border-emerald-400 {
   background-color: #ffffff !important;
-  border-color: #e5e7eb;
+}
+html:not(.dark) .bg-slate-700.focus-within\:border-emerald-400:not(:focus-within) {
+  border-color: #e5e7eb !important;
+}
+html:not(.dark) .bg-slate-700.focus-within\:border-emerald-400:focus-within {
+  border-color: #10b981 !important;
 }
 
 /* ── Main frame shadow ── */
@@ -533,4 +544,167 @@ html:not(.dark) circle[fill="#0f172a"] {
 /* ── SVG charts: axis label text (slate-400 → darker for contrast on white) ── */
 html:not(.dark) text[fill="#94a3b8"] {
   fill: #64748b !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   Scan-receipt tips card light mode overrides
+   ════════════════════════════════════════════════════════ */
+
+/* Individual tip item background */
+html:not(.dark) .bg-slate-700\/40 {
+  background-color: rgba(243, 244, 246, 0.7) !important;
+}
+
+/* Privacy note background */
+html:not(.dark) .bg-emerald-900\/20 {
+  background-color: #f0fdf4 !important;
+}
+
+/* Privacy note border */
+html:not(.dark) .border-emerald-700\/30 {
+  border-color: rgba(5, 150, 105, 0.2) !important;
+}
+
+/* ── Clear-all destructive button ── */
+html:not(.dark) .bg-red-900\/20 {
+  background-color: #fff1f2 !important;
+}
+html:not(.dark) .border-red-700\/50 {
+  border-color: #fca5a5 !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   Scan-receipt step 2 light mode overrides
+   ════════════════════════════════════════════════════════ */
+
+/* Category section background */
+html:not(.dark) .bg-slate-700\/30 {
+  background-color: rgba(241, 245, 249, 0.8) !important;
+}
+
+/* Item dividers */
+html:not(.dark) .divide-slate-700\/40 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(229, 231, 235, 0.8) !important;
+}
+
+/* AI info banner border */
+html:not(.dark) .border-emerald-700\/40 {
+  border-color: rgba(5, 150, 105, 0.25) !important;
+}
+
+/* AI info banner text */
+html:not(.dark) .text-emerald-300 {
+  color: #047857 !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   Add-item dialog light mode overrides
+   ════════════════════════════════════════════════════════ */
+
+/* Dialog overlay card */
+html:not(.dark) .bg-slate-900 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) .bg-slate-800\/30 {
+  background-color: rgba(248, 250, 252, 0.9) !important;
+}
+html:not(.dark) .bg-slate-800\/40 {
+  background-color: rgba(248, 250, 252, 0.8) !important;
+}
+
+/* Nutrition grid cells in dialog */
+html:not(.dark) .bg-slate-700\/50 {
+  background-color: rgba(241, 245, 249, 0.8) !important;
+}
+
+/* AI suggestion row value text */
+html:not(.dark) .text-emerald-400 {
+  color: #059669 !important;
+}
+
+/* Emerald badge in AI panel */
+html:not(.dark) .bg-emerald-900\/40 {
+  background-color: #ecfdf5 !important;
+}
+html:not(.dark) .border-emerald-700\/50 {
+  border-color: rgba(5, 150, 105, 0.25) !important;
+}
+
+/* Toggle off state */
+html:not(.dark) .bg-slate-600 {
+  background-color: #cbd5e1 !important;
+}
+
+/* Barcode / add-category button bg */
+html:not(.dark) .bg-slate-800 {
+  background-color: #f8fafc !important;
+}
+
+/* Footer add-more button */
+html:not(.dark) .bg-emerald-900\/30 {
+  background-color: #ecfdf5 !important;
+}
+html:not(.dark) .border-emerald-600\/70 {
+  border-color: rgba(5, 150, 105, 0.4) !important;
+}
+html:not(.dark) .hover\:bg-emerald-900\/50:hover {
+  background-color: #d1fae5 !important;
+}
+
+html:not(.dark) .datepicker-trigger {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Disabled TextInput wrapper — dark mode: darker bg; light mode: light gray */
+.input-disabled {
+  background-color: #1e293b; /* slate-800 — darker than active in dark mode */
+}
+
+/* Disabled TextInput wrapper in light mode → light gray */
+html:not(.dark) .input-disabled {
+  background-color: #f1f5f9 !important;
+  border-color: #e5e7eb !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   DatePicker calendar popup light mode overrides
+   (.datepicker-popup scoped to avoid collisions)
+   ════════════════════════════════════════════════════════ */
+html:not(.dark) .datepicker-popup {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+/* Day grid: in-month cells */
+html:not(.dark) .datepicker-popup .text-slate-200 {
+  color: #1e293b !important;
+}
+/* Day grid: outside-month cells */
+html:not(.dark) .datepicker-popup .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+/* Day grid: day-of-week headers */
+html:not(.dark) .datepicker-popup .text-slate-500 {
+  color: #94a3b8 !important;
+}
+/* Month/year label */
+html:not(.dark) .datepicker-popup .text-slate-100 {
+  color: #0f172a !important;
+}
+/* Nav buttons */
+html:not(.dark) .datepicker-popup .text-slate-400 {
+  color: #64748b !important;
+}
+html:not(.dark) .datepicker-popup .hover\:bg-slate-700:hover {
+  background-color: #f1f5f9 !important;
+}
+html:not(.dark) .datepicker-popup .hover\:text-slate-100:hover {
+  color: #0f172a !important;
+}
+/* Hint row */
+html:not(.dark) .datepicker-popup .bg-emerald-900\/20 {
+  background-color: #f0fdf4 !important;
+}
+html:not(.dark) .datepicker-popup .border-emerald-700\/30 {
+  border-color: rgba(5, 150, 105, 0.2) !important;
 }

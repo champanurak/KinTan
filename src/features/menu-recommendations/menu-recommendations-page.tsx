@@ -13,6 +13,7 @@ import {
 import AppShell from "@/components/layout/app-shell";
 import { recordCook } from "@/lib/cook-stats";
 import { CookConfirmDialog } from "@/components/ui/cook-confirm-dialog";
+import { usePantryStore } from "@/store/pantry-store";
 
 interface IngredientItem {
   name: string;
@@ -84,6 +85,7 @@ type RecommendedMenu = MenuItem & {
   matchedCount: number;
   matchPercent: number;
   matchedKeywords: string[];
+  nutritionMatchCount: number;
 };
 
 const LIKED_MENUS_KEY = "liked_menu_recommendations";
@@ -1519,7 +1521,7 @@ const menus: MenuItem[] = [
 
 export default function MenuRecommendationsPage() {
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
-  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
+  const pantryItems = usePantryStore((s) => s.items);
   const [likedMenus, setLikedMenus] = useState<Set<string>>(new Set());
   const [servings, setServings] = useState(2);
   const [cookConfirmMenu, setCookConfirmMenu] = useState<MenuItem | null>(null);
@@ -1553,39 +1555,21 @@ export default function MenuRecommendationsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const loadPantryItems = () => {
-      try {
-        const raw = localStorage.getItem("pantry_items");
-        if (!raw) {
-          setPantryItems([]);
-          return;
-        }
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setPantryItems(parsed);
-        } else {
-          setPantryItems([]);
-        }
-      } catch {
-        setPantryItems([]);
-      }
-    };
-
-    loadPantryItems();
-    window.addEventListener("focus", loadPantryItems);
-    return () => window.removeEventListener("focus", loadPantryItems);
-  }, []);
-
   const recommendedMenus = useMemo<RecommendedMenu[]>(() => {
     if (pantryItems.length === 0) return [];
 
     const pantryNames = pantryItems.map((item) => item.name.toLowerCase());
+    const nutritionNames = pantryItems
+      .filter((item) => item.forNutrition)
+      .map((item) => item.name.toLowerCase());
 
     const scoredMenus = menus.map((menu) => {
       const matchedKeywords = menu.matchKeywords.filter((keyword) =>
         pantryNames.some((name) => name.includes(keyword.toLowerCase())),
       );
+      const nutritionMatchCount = menu.matchKeywords.filter((keyword) =>
+        nutritionNames.some((name) => name.includes(keyword.toLowerCase())),
+      ).length;
 
       const matchedCount = matchedKeywords.length;
       const matchPercent = Math.round(
@@ -1597,6 +1581,7 @@ export default function MenuRecommendationsPage() {
         matchedKeywords,
         matchedCount,
         matchPercent,
+        nutritionMatchCount,
       };
     });
 
@@ -1606,6 +1591,7 @@ export default function MenuRecommendationsPage() {
         const aLiked = likedMenus.has(a.id) ? 1 : 0;
         const bLiked = likedMenus.has(b.id) ? 1 : 0;
         if (bLiked !== aLiked) return bLiked - aLiked;
+        if (b.nutritionMatchCount !== a.nutritionMatchCount) return b.nutritionMatchCount - a.nutritionMatchCount;
         return (
           b.matchPercent - a.matchPercent || b.matchedCount - a.matchedCount
         );

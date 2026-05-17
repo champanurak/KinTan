@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { X, Clock } from "lucide-react";
 import { CookConfirmDialog } from "@/components/ui/cook-confirm-dialog";
@@ -8,6 +8,7 @@ import { NutritionGrid } from "@/components/ui/nutrition-grid";
 import { LikeButton } from "@/components/ui/like-button";
 import AppShell from "@/components/layout/app-shell";
 import { recordCook } from "@/lib/cook-stats";
+import { usePantryStore } from "@/store/pantry-store";
 
 interface Recipe {
   id: string;
@@ -95,8 +96,41 @@ const RECIPE_GUIDE_DB: Record<string, RecipeGuide> = {
 
 const LIKED_KEY = "liked_recipes";
 
+function daysUntil(isoDate: string): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(isoDate + "T00:00:00");
+  target.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - today.getTime()) / 86400000);
+}
+
+function expiringGradient(daysLeft: number): { image: string; color: string } {
+  if (daysLeft <= 1) return { image: "from-red-100 to-red-200",    color: "border-red-200" };
+  if (daysLeft <= 2) return { image: "from-orange-100 to-orange-200", color: "border-orange-200" };
+  if (daysLeft <= 3) return { image: "from-amber-100 to-amber-200",  color: "border-amber-200" };
+  return               { image: "from-yellow-100 to-yellow-200", color: "border-yellow-200" };
+}
+
+function itemEmojiFromName(name: string, category: string): string {
+  if (name.includes("ไก่")) return "🍗";
+  if (name.includes("หมู")) return "🥩";
+  if (name.includes("นม")) return "🥛";
+  if (name.includes("ไข่")) return "🥚";
+  if (name.includes("ผัก")) return "🥬";
+  if (name.includes("แครอท")) return "🥕";
+  if (name.includes("เห็ด")) return "🍄";
+  if (name.includes("เต้าหู้")) return "🐟";
+  if (name.includes("โยเกิร์ต")) return "🭙";
+  const CAT: Record<string, string> = {
+    "เนื้อสัตว์": "🥩", "ผักและผลไม้": "🥦", "นมและเนย": "🥛",
+    "เครื่องปรุง": "🧂", "เครื่องดื่ม": "🥤", "อาหารแช่แข็ง": "🧧",
+  };
+  return CAT[category] ?? "📦";
+}
+
 export default function ExpiringSoonPage() {
   const router = useRouter();
+  const pantryItems = usePantryStore((s) => s.items);
   const [selectedItem, setSelectedItem] = useState<ExpiringItem | null>(null);
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
@@ -159,7 +193,36 @@ export default function ExpiringSoonPage() {
     };
   }
 
-  const urgentCount = ITEM_DATA.filter(i => i.daysLeft <= 2).length;
+  const dynamicExpiringItems = useMemo<ExpiringItem[]>(() => {
+    return pantryItems
+      .filter((item) => item.alertExpiry && item.expiresAt)
+      .map((item) => {
+        const daysLeft = daysUntil(item.expiresAt!);
+        const { image, color } = expiringGradient(daysLeft);
+        const recipeKey = Object.keys(RECIPE_DB).find((k) =>
+          item.name.includes(k) || k.includes(item.name.slice(0, 3))
+        );
+        return {
+          name: item.name,
+          daysLeft,
+          emoji: itemEmojiFromName(item.name, item.category),
+          image,
+          color,
+          recipes: recipeKey ? RECIPE_DB[recipeKey] : [],
+        };
+      })
+      .filter((item) => item.daysLeft <= 14)
+      .sort((a, b) => a.daysLeft - b.daysLeft);
+  }, [pantryItems]);
+
+  const allExpiringItems = useMemo<ExpiringItem[]>(() => {
+    return [
+      ...dynamicExpiringItems,
+      ...ITEM_DATA.filter((hd) => !dynamicExpiringItems.some((d) => d.name === hd.name)),
+    ];
+  }, [dynamicExpiringItems]);
+
+  const urgentCount = allExpiringItems.filter(i => i.daysLeft <= 2).length;
 
   return (
     <AppShell title="แจ้งเตือน" subtitle="ดูรายการที่ควรใช้ก่อนเพื่อลดการทิ้งอาหาร">
@@ -175,7 +238,7 @@ export default function ExpiringSoonPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ITEM_DATA.map(item => {
+        {allExpiringItems.map(item => {
           const urgent = item.daysLeft <= 2;
           return (
             <div key={item.name} className={`rounded-2xl border overflow-hidden bg-slate-800/60 shadow-sm ${item.color}`}>
