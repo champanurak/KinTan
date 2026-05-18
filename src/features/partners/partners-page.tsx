@@ -59,28 +59,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "discount",    label: "ส่วนลดมากที่สุด" },
 ];
 
-function getMockPrice(name: string): number {
-  const map: Record<string, number> = {
-    วุ้นเส้น: 15, น้ำจิ้มสุกี้: 63, น้ำจิ้ม: 63, หมู: 89, ไก่: 75, ไข่: 45,
-    ผักกาด: 25, กะเพรา: 15, กระเทียม: 20, พริก: 18, น้ำปลา: 35,
-    ซีอิ๊ว: 28, น้ำมัน: 55, แครอท: 25, ข้าวโพด: 35, น้ำมันหอย: 42,
-    ข้าว: 35, ซุป: 30, วุ้น: 15,
-  };
-  for (const key of Object.keys(map)) {
-    if (name.includes(key)) return map[key];
-  }
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = ((h << 5) - h + name.charCodeAt(i)) | 0;
-  return 19 + (Math.abs(h) % 71);
-}
-
-const SUGGESTED_PRODUCTS = [
-  { emoji: "🥕", name: "แครอท", price: 25 },
-  { emoji: "🧄", name: "กระเทียม", price: 20 },
-  { emoji: "🌶️", name: "พริกสด", price: 18 },
-  { emoji: "🥬", name: "ผักกาดขาว", price: 22 },
-];
-
 const partners: Partner[] = [
   {
     id: "lotuss",

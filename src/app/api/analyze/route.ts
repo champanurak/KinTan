@@ -18,56 +18,17 @@ const DEFAULT_CATEGORIES = [
   "อื่นๆ",
 ];
 
-function buildSystemPrompt(categoryNames: string[]): string {
-  const categoryList = categoryNames.map((c) => `- ${c}`).join("\n");
-  return `คุณคือผู้ช่วยวิเคราะห์ใบเสร็จร้านค้าภาษาไทย
-อ่านข้อมูลจากตารางรายการสินค้าในใบเสร็จ แล้วตอบกลับด้วย JSON array เท่านั้น ไม่มีข้อความอื่น
-
-รูปแบบ JSON ที่ต้องการ:
-[
-  {"name": "ชื่อสินค้า", "price": 0.00, "quantity": 1, "unit": "หน่วย", "category": "หมวดหมู่"}
-]
-
-วิธีอ่านตาราง:
-- name → คัดลอกข้อความจากคอลัมน์ DESCRIPTION/รายละเอียด ทุกตัวอักษร ห้ามย่อ ห้ามแปล ห้ามเปลี่ยน
-- quantity → ตัวเลขจากคอลัมน์ QUANTITY/จำนวน (ถ้าไม่มีให้ใส่ 1)
-- unit → คัดลอกจากคอลัมน์ UNIT/หน่วย ตรงๆ (เช่น แพ็ค, ลัง, ถุง, ขวด, กล่อง, ห่อ, กระป๋อง, ฟอง, ท่อน) ถ้าไม่มีให้ใส่ "ชิ้น"
-- price → ราคาต่อหน่วยจากคอลัมน์ UNIT PRICE/ราคาต่อหน่วย (ไม่ใช่ราคารวม — ถ้าไม่ชัดเจนให้ใส่ 0)
-- category → เลือกหมวดหมู่ที่เหมาะสมที่สุดจากรายการด้านล่าง ห้ามสร้างหมวดหมู่ใหม่
-
-หมวดหมู่ที่ใช้ได้ (ต้องใช้ชื่อตามนี้เท่านั้น):
-${categoryList}`;
-}
-
-interface AiItem {
-  name: string;
-  price: number;
-  quantity: number;
-  unit: string;
-  category: string;
-}
-
-function parseAiResponse(text: string): AiItem[] {
-  try {
-    // Extract JSON array from the response (handle markdown code blocks)
-    const match = text.match(/\[[\s\S]*\]/);
-    if (!match) return [];
-    const parsed = JSON.parse(match[0]);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((it: AiItem) => it.name && typeof it.name === "string");
-  } catch {
-    return [];
-  }
-}
-
-function buildMockResponse(rawText: string, source: AnalyzeReceiptResponse["source"]): AnalyzeReceiptResponse {
+function buildMockResponse(
+  rawText: string,
+  source: AnalyzeReceiptResponse["source"],
+): AnalyzeReceiptResponse {
   const items = extractItemsFromText(rawText);
   return {
     receiptId: `rcpt_${Date.now()}`,
     source,
     items,
     total: sumReceipt(items),
-    rawText
+    rawText,
   };
 }
 
@@ -92,10 +53,11 @@ export async function POST(request: Request) {
     }
   }
 
-  const SYSTEM_PROMPT = buildSystemPrompt(categoryNames);
-
   if (!(image instanceof File) && !receiptText) {
-    return NextResponse.json({ error: "Please provide an image or receipt text." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Please provide an image or receipt text." },
+      { status: 400 },
+    );
   }
 
   const openAI = getOpenAIClient();
@@ -147,21 +109,30 @@ export async function POST(request: Request) {
                     items: {
                       type: "object",
                       properties: {
-                        row:        { type: "integer" },
+                        row: { type: "integer" },
                         article_no: { type: "string" },
-                        name:       { type: "string" },
-                        quantity:   { type: "number" },
-                        unit:       { type: "string" },
+                        name: { type: "string" },
+                        quantity: { type: "number" },
+                        unit: { type: "string" },
                         unit_price: { type: "number" },
-                        row_total:  { type: "number" },
-                        category:   { type: "string" },
+                        row_total: { type: "number" },
+                        category: { type: "string" },
                       },
-                      required: ["row","article_no","name","quantity","unit","unit_price","row_total","category"],
+                      required: [
+                        "row",
+                        "article_no",
+                        "name",
+                        "quantity",
+                        "unit",
+                        "unit_price",
+                        "row_total",
+                        "category",
+                      ],
                       additionalProperties: false,
                     },
                   },
                 },
-                required: ["grand_total","items"],
+                required: ["grand_total", "items"],
                 additionalProperties: false,
               },
             },
@@ -170,31 +141,51 @@ export async function POST(request: Request) {
           max_output_tokens: 8192,
         });
         const rawText = parseResponse.output_text?.trim() ?? "";
-        let parsed: { grand_total: number; items: Array<{ row: number; article_no: string; name: string; quantity: number; unit: string; unit_price: number; row_total: number; category: string }> } | null = null;
-        try { parsed = JSON.parse(rawText); } catch { /* fall through */ }
+        let parsed: {
+          grand_total: number;
+          items: Array<{
+            row: number;
+            article_no: string;
+            name: string;
+            quantity: number;
+            unit: string;
+            unit_price: number;
+            row_total: number;
+            category: string;
+          }>;
+        } | null = null;
+        try {
+          parsed = JSON.parse(rawText);
+        } catch {
+          /* fall through */
+        }
         if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
           const items: ReceiptItem[] = parsed.items.map((it) => {
             const qty = Number(it.quantity) || 1;
             const rowTotal = Number(it.row_total) || 0;
             // คำนวณ unit_price จาก row_total ÷ quantity เพื่อความแม่นยำ 100%
             // ป้องกันกรณี AI สับสนระหว่างคอลัมน์ unit_price กับ row_total
-            const unitPrice = qty > 0 ? Math.round((rowTotal / qty) * 100) / 100 : Number(it.unit_price) || 0;
+            const unitPrice =
+              qty > 0
+                ? Math.round((rowTotal / qty) * 100) / 100
+                : Number(it.unit_price) || 0;
             return {
-              name:       it.name,
-              category:   it.category || "อื่นๆ",
-              price:      unitPrice,
+              name: it.name,
+              category: it.category || "อื่นๆ",
+              price: unitPrice,
               confidence: 0.95,
-              unit:       it.unit || "ชิ้น",
-              quantity:   qty,
+              unit: it.unit || "ชิ้น",
+              quantity: qty,
             };
           });
           return NextResponse.json({
             receiptId: `rcpt_${Date.now()}`,
             source: "openai",
             items,
-            total: (parsed.grand_total && parsed.grand_total > 0)
-              ? parsed.grand_total
-              : items.reduce((s, it) => s + it.price * (it.quantity ?? 1), 0),
+            total:
+              parsed.grand_total && parsed.grand_total > 0
+                ? parsed.grand_total
+                : items.reduce((s, it) => s + it.price * (it.quantity ?? 1), 0),
             rawText: googleOcrText,
           } satisfies AnalyzeReceiptResponse);
         }
@@ -204,7 +195,9 @@ export async function POST(request: Request) {
     }
 
     if (!openAI) {
-      return NextResponse.json(buildMockResponse(googleOcrText || "No OCR result", "ocr-fallback"));
+      return NextResponse.json(
+        buildMockResponse(googleOcrText || "No OCR result", "ocr-fallback"),
+      );
     }
 
     const categoryList = categoryNames.map((c) => `"${c}"`).join(", ");
@@ -270,21 +263,30 @@ export async function POST(request: Request) {
                   items: {
                     type: "object",
                     properties: {
-                      row:        { type: "integer" },
+                      row: { type: "integer" },
                       article_no: { type: "string" },
-                      name:       { type: "string" },
-                      quantity:   { type: "number" },
-                      unit:       { type: "string" },
+                      name: { type: "string" },
+                      quantity: { type: "number" },
+                      unit: { type: "string" },
                       unit_price: { type: "number" },
-                      row_total:  { type: "number" },
-                      category:   { type: "string" },
+                      row_total: { type: "number" },
+                      category: { type: "string" },
                     },
-                    required: ["row","article_no","name","quantity","unit","unit_price","row_total","category"],
+                    required: [
+                      "row",
+                      "article_no",
+                      "name",
+                      "quantity",
+                      "unit",
+                      "unit_price",
+                      "row_total",
+                      "category",
+                    ],
                     additionalProperties: false,
                   },
                 },
               },
-              required: ["grand_total","items"],
+              required: ["grand_total", "items"],
               additionalProperties: false,
             },
           },
@@ -295,35 +297,57 @@ export async function POST(request: Request) {
 
       const rawText = response.output_text?.trim() ?? "";
 
-      let parsed: { grand_total: number; items: Array<{ row: number; article_no: string; name: string; quantity: number; unit: string; unit_price: number; row_total: number; category: string }> } | null = null;
-      try { parsed = JSON.parse(rawText); } catch { /* fall through */ }
+      let parsed: {
+        grand_total: number;
+        items: Array<{
+          row: number;
+          article_no: string;
+          name: string;
+          quantity: number;
+          unit: string;
+          unit_price: number;
+          row_total: number;
+          category: string;
+        }>;
+      } | null = null;
+      try {
+        parsed = JSON.parse(rawText);
+      } catch {
+        /* fall through */
+      }
 
       if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
         const items: ReceiptItem[] = parsed.items.map((it) => {
           const qty = Number(it.quantity) || 1;
           const rowTotal = Number(it.row_total) || 0;
-          const unitPrice = qty > 0 ? Math.round((rowTotal / qty) * 100) / 100 : Number(it.unit_price) || 0;
+          const unitPrice =
+            qty > 0
+              ? Math.round((rowTotal / qty) * 100) / 100
+              : Number(it.unit_price) || 0;
           return {
-            name:       it.name,
-            category:   it.category || "อื่นๆ",
-            price:      unitPrice,
+            name: it.name,
+            category: it.category || "อื่นๆ",
+            price: unitPrice,
             confidence: 0.9,
-            unit:       it.unit || "ชิ้น",
-            quantity:   qty,
+            unit: it.unit || "ชิ้น",
+            quantity: qty,
           };
         });
         return NextResponse.json({
           receiptId: `rcpt_${Date.now()}`,
           source: "openai",
           items,
-          total: (parsed.grand_total && parsed.grand_total > 0)
-            ? parsed.grand_total
-            : items.reduce((s, it) => s + it.price * (it.quantity ?? 1), 0),
+          total:
+            parsed.grand_total && parsed.grand_total > 0
+              ? parsed.grand_total
+              : items.reduce((s, it) => s + it.price * (it.quantity ?? 1), 0),
           rawText,
         } satisfies AnalyzeReceiptResponse);
       }
 
-      return NextResponse.json(buildMockResponse(rawText || "OpenAI analysis completed.", "openai"));
+      return NextResponse.json(
+        buildMockResponse(rawText || "OpenAI analysis completed.", "openai"),
+      );
     } catch {
       // Fall through to OCR fallback.
     }
@@ -332,10 +356,17 @@ export async function POST(request: Request) {
   if (image instanceof File) {
     const buffer = Buffer.from(await image.arrayBuffer());
     const imageBase64 = buffer.toString("base64");
-    const ocrText = (await getGoogleOcrFallbackText(imageBase64)) ?? receiptText;
-    return NextResponse.json(buildMockResponse(ocrText || "Fallback OCR not configured.", "ocr-fallback"));
+    const ocrText =
+      (await getGoogleOcrFallbackText(imageBase64)) ?? receiptText;
+    return NextResponse.json(
+      buildMockResponse(
+        ocrText || "Fallback OCR not configured.",
+        "ocr-fallback",
+      ),
+    );
   }
 
-  return NextResponse.json(buildMockResponse(receiptText || "Manual text analysis", "ocr-fallback"));
+  return NextResponse.json(
+    buildMockResponse(receiptText || "Manual text analysis", "ocr-fallback"),
+  );
 }
-
