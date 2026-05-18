@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Heart,
   X,
@@ -14,6 +15,7 @@ import AppShell from "@/components/layout/app-shell";
 import { recordCook } from "@/lib/cook-stats";
 import { CookConfirmDialog } from "@/components/ui/cook-confirm-dialog";
 import { usePantryStore } from "@/store/pantry-store";
+import { useShoppingStore } from "@/store/shopping-store";
 
 interface IngredientItem {
   name: string;
@@ -275,7 +277,7 @@ const menus: MenuItem[] = [
       },
       {
         name: "ไข่ไก่",
-        required: 1,
+        required: 2,
         unit: "ฟอง",
         emoji: "🥚",
         matchKey: "ไข่",
@@ -591,31 +593,31 @@ const menus: MenuItem[] = [
     imageClass: "from-pink-100 to-rose-100",
     matchKeywords: ["นม", "กล้วย", "น้ำผึ้ง"],
     ingredients: [
-      { name: "นมสด", required: 200, unit: "มล.", emoji: "🥛", matchKey: "นม" },
+      { name: "นมสด", required: 400, unit: "มล.", emoji: "🥛", matchKey: "นม" },
       {
         name: "กล้วย",
-        required: 1,
+        required: 2,
         unit: "ลูก",
         emoji: "🍌",
         matchKey: "กล้วย",
       },
       {
         name: "สตรอว์เบอร์รี่",
-        required: 5,
+        required: 10,
         unit: "ลูก",
         emoji: "🍓",
         matchKey: "ผลไม้",
       },
       {
         name: "น้ำผึ้ง",
-        required: 1,
+        required: 2,
         unit: "ช้อนชา",
         emoji: "🍯",
         matchKey: "น้ำผึ้ง",
       },
       {
         name: "น้ำแข็ง",
-        required: 1,
+        required: 2,
         unit: "ถ้วย",
         emoji: "🧊",
         matchKey: "น้ำแข็ง",
@@ -640,24 +642,24 @@ const menus: MenuItem[] = [
     imageClass: "from-amber-100 to-orange-100",
     matchKeywords: ["นม", "น้ำตาล"],
     ingredients: [
-      { name: "นมสด", required: 200, unit: "มล.", emoji: "🥛", matchKey: "นม" },
+      { name: "นมสด", required: 400, unit: "มล.", emoji: "🥛", matchKey: "นม" },
       {
         name: "โอวัลติน",
-        required: 3,
+        required: 6,
         unit: "ช้อนโต๊ะ",
         emoji: "🫙",
         matchKey: "โอวัลติน",
       },
       {
         name: "น้ำร้อน",
-        required: 50,
+        required: 100,
         unit: "มล.",
         emoji: "☕",
         matchKey: "น้ำ",
       },
       {
         name: "น้ำตาล",
-        required: 1,
+        required: 2,
         unit: "ช้อนชา",
         emoji: "🧂",
         matchKey: "น้ำตาล",
@@ -682,17 +684,17 @@ const menus: MenuItem[] = [
     imageClass: "from-yellow-100 to-amber-100",
     matchKeywords: ["นม", "ไข่", "น้ำตาล"],
     ingredients: [
-      { name: "นมสด", required: 500, unit: "มล.", emoji: "🥛", matchKey: "นม" },
+      { name: "นมสด", required: 300, unit: "มล.", emoji: "🥛", matchKey: "นม" },
       {
         name: "ไข่ไก่",
-        required: 3,
+        required: 2,
         unit: "ฟอง",
         emoji: "🥚",
         matchKey: "ไข่",
       },
       {
         name: "น้ำตาล",
-        required: 4,
+        required: 3,
         unit: "ช้อนโต๊ะ",
         emoji: "🧂",
         matchKey: "น้ำตาล",
@@ -1098,14 +1100,14 @@ const menus: MenuItem[] = [
     ingredients: [
       {
         name: "แครอท",
-        required: 3,
+        required: 4,
         unit: "หัว",
         emoji: "🥕",
         matchKey: "แครอท",
       },
       {
         name: "น้ำเปล่า",
-        required: 200,
+        required: 400,
         unit: "มล.",
         emoji: "💧",
         matchKey: "น้ำ",
@@ -1139,35 +1141,35 @@ const menus: MenuItem[] = [
     ingredients: [
       {
         name: "โยเกิร์ตธรรมชาติ",
-        required: 200,
+        required: 400,
         unit: "กรัม",
         emoji: "🫙",
         matchKey: "โยเกิร์ต",
       },
       {
         name: "กราโนลา",
-        required: 4,
+        required: 8,
         unit: "ช้อนโต๊ะ",
         emoji: "🌾",
         matchKey: "กราโนลา",
       },
       {
         name: "สตรอว์เบอร์รี่",
-        required: 5,
+        required: 10,
         unit: "ลูก",
         emoji: "🍓",
         matchKey: "ผลไม้",
       },
       {
         name: "น้ำผึ้ง",
-        required: 1,
+        required: 2,
         unit: "ช้อนชา",
         emoji: "🍯",
         matchKey: "น้ำผึ้ง",
       },
       {
         name: "บลูเบอร์รี่",
-        required: 10,
+        required: 20,
         unit: "เม็ด",
         emoji: "🫐",
         matchKey: "ผลไม้",
@@ -1194,28 +1196,28 @@ const menus: MenuItem[] = [
     ingredients: [
       {
         name: "โยเกิร์ตธรรมชาติ",
-        required: 200,
+        required: 400,
         unit: "กรัม",
         emoji: "🫙",
         matchKey: "โยเกิร์ต",
       },
       {
         name: "น้ำเย็น",
-        required: 150,
+        required: 300,
         unit: "มล.",
         emoji: "💧",
         matchKey: "น้ำ",
       },
       {
         name: "น้ำตาล",
-        required: 2,
+        required: 4,
         unit: "ช้อนชา",
         emoji: "🧂",
         matchKey: "น้ำตาล",
       },
       {
         name: "น้ำแข็ง",
-        required: 1,
+        required: 2,
         unit: "ถ้วย",
         emoji: "🧊",
         matchKey: "น้ำแข็ง",
@@ -1242,29 +1244,29 @@ const menus: MenuItem[] = [
     ingredients: [
       {
         name: "โยเกิร์ตธรรมชาติ",
-        required: 150,
+        required: 300,
         unit: "กรัม",
         emoji: "🫙",
         matchKey: "โยเกิร์ต",
       },
       {
         name: "กล้วย",
-        required: 1,
+        required: 2,
         unit: "ลูก",
         emoji: "🍌",
         matchKey: "กล้วย",
       },
-      { name: "นมสด", required: 100, unit: "มล.", emoji: "🥛", matchKey: "นม" },
+      { name: "นมสด", required: 200, unit: "มล.", emoji: "🥛", matchKey: "นม" },
       {
         name: "น้ำผึ้ง",
-        required: 1,
+        required: 2,
         unit: "ช้อนชา",
         emoji: "🍯",
         matchKey: "น้ำผึ้ง",
       },
       {
         name: "น้ำแข็ง",
-        required: 0.5,
+        required: 1,
         unit: "ถ้วย",
         emoji: "🧊",
         matchKey: "น้ำแข็ง",
@@ -1291,7 +1293,7 @@ const menus: MenuItem[] = [
     ingredients: [
       {
         name: "มาม่า",
-        required: 1,
+        required: 2,
         unit: "ซอง",
         emoji: "🍜",
         matchKey: "มาม่า",
@@ -1303,17 +1305,17 @@ const menus: MenuItem[] = [
         emoji: "🍗",
         matchKey: "ไก่",
       },
-      { name: "น้ำ", required: 400, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
+      { name: "น้ำ", required: 800, unit: "มล.", emoji: "💧", matchKey: "น้ำ" },
       {
         name: "ไข่ไก่",
-        required: 1,
+        required: 2,
         unit: "ฟอง",
         emoji: "🥚",
         matchKey: "ไข่",
       },
       {
         name: "ต้นหอม",
-        required: 1,
+        required: 2,
         unit: "ต้น",
         emoji: "🌱",
         matchKey: "ต้นหอม",
@@ -1519,9 +1521,31 @@ const menus: MenuItem[] = [
   },
 ];
 
+/** คำนวณจำนวนมื้อสูงสุดที่ทำได้จากวัตถุดิบในคลัง */
+function calcMaxServings(menu: MenuItem, pantryItems: PantryItem[]): number {
+  const BASE = 2;
+  let maxServings = Infinity;
+  for (const ing of menu.ingredients) {
+    const pantryItem = pantryItems.find(
+      (p) =>
+        p.name.toLowerCase().includes(ing.matchKey.toLowerCase()) ||
+        ing.matchKey.toLowerCase().includes(p.name.toLowerCase()),
+    );
+    if (!pantryItem || pantryItem.quantity <= 0) {
+      maxServings = 0;
+      break;
+    }
+    maxServings = Math.min(maxServings, (pantryItem.quantity / ing.required) * BASE);
+  }
+  if (!isFinite(maxServings)) return BASE;
+  return Math.max(1, Math.floor(maxServings));
+}
+
 export default function MenuRecommendationsPage() {
+  const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const pantryItems = usePantryStore((s) => s.items);
+  const setMissingItems = useShoppingStore((s) => s.setMissingItems);
   const [likedMenus, setLikedMenus] = useState<Set<string>>(new Set());
   const [servings, setServings] = useState(2);
   const [cookConfirmMenu, setCookConfirmMenu] = useState<MenuItem | null>(null);
@@ -1550,7 +1574,7 @@ export default function MenuRecommendationsPage() {
       const found = menus.find((m) => m.id === menuId);
       if (found) {
         setSelectedMenu(found);
-        setServings(2);
+        setServings(calcMaxServings(found, pantryItems));
       }
     }
   }, []);
@@ -1698,7 +1722,7 @@ export default function MenuRecommendationsPage() {
               img: cookConfirmMenu.recipeImage,
             });
             setSelectedMenu(cookConfirmMenu);
-            setServings(2);
+            setServings(calcMaxServings(cookConfirmMenu, pantryItems));
             setCookConfirmMenu(null);
           }}
         />
@@ -1912,6 +1936,24 @@ export default function MenuRecommendationsPage() {
                     <div className="px-4 py-3 border-t border-slate-700">
                       <button
                         type="button"
+                        onClick={() => {
+                          const missing = selectedMenu.ingredients
+                            .filter(
+                              (ing) =>
+                                !getIngredientStatus(ing, pantryItems, servings).enough,
+                            )
+                            .map((ing) => ({
+                              name: ing.name,
+                              emoji: ing.emoji,
+                              required:
+                                Math.round(
+                                  ((ing.required * servings) / 2) * 10,
+                                ) / 10,
+                              unit: ing.unit,
+                            }));
+                          setMissingItems(missing, selectedMenu.name);
+                          router.push("/partners");
+                        }}
                         className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-600/60 px-4 py-2.5 text-sm font-semibold text-emerald-400 hover:bg-emerald-900/30 transition"
                       >
                         <ShoppingCart className="h-4 w-4" />

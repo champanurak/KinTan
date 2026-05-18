@@ -91,9 +91,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_20%_10%,#0a1628_0%,#07111f_50%,#060e1a_100%)] px-4 py-8 text-slate-100 md:px-8 md:py-14">
+    <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 md:px-8 md:py-14">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-center">
-        <section className="grid w-full overflow-hidden rounded-[2rem] border border-slate-700/80 bg-slate-800/95 shadow-[0_18px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur md:grid-cols-2">
+        <section className="grid w-full overflow-hidden rounded-[2rem] border border-slate-700 bg-slate-800 shadow-[0_18px_60px_-28px_rgba(0,0,0,0.6)] backdrop-blur md:grid-cols-2">
           <aside className="relative border-b border-emerald-900/60 bg-gradient-to-b from-emerald-900/40 to-emerald-900/20 p-8 md:border-b-0 md:border-r md:p-10">
             <div className="mx-auto max-w-sm">
               <div className="inline-flex items-center gap-3">

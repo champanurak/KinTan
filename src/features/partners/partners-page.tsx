@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
   Info, ShoppingBasket, Building2, Store, Globe, MapPin,
-  ChevronDown, Truck, Navigation,
+  ChevronDown, Truck, Navigation, ShoppingCart,
 } from "lucide-react";
 import AppShell from "@/components/layout/app-shell";
+import { useShoppingStore } from "@/store/shopping-store";
 
 type CategoryFilter = "all" | "supermarket" | "convenience" | "online" | "nearme";
 type SortOption = "recommended" | "nearest" | "discount";
@@ -56,6 +57,28 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "recommended", label: "แนะนำ" },
   { value: "nearest",     label: "ใกล้ฉัน" },
   { value: "discount",    label: "ส่วนลดมากที่สุด" },
+];
+
+function getMockPrice(name: string): number {
+  const map: Record<string, number> = {
+    วุ้นเส้น: 15, น้ำจิ้มสุกี้: 63, น้ำจิ้ม: 63, หมู: 89, ไก่: 75, ไข่: 45,
+    ผักกาด: 25, กะเพรา: 15, กระเทียม: 20, พริก: 18, น้ำปลา: 35,
+    ซีอิ๊ว: 28, น้ำมัน: 55, แครอท: 25, ข้าวโพด: 35, น้ำมันหอย: 42,
+    ข้าว: 35, ซุป: 30, วุ้น: 15,
+  };
+  for (const key of Object.keys(map)) {
+    if (name.includes(key)) return map[key];
+  }
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = ((h << 5) - h + name.charCodeAt(i)) | 0;
+  return 19 + (Math.abs(h) % 71);
+}
+
+const SUGGESTED_PRODUCTS = [
+  { emoji: "🥕", name: "แครอท", price: 25 },
+  { emoji: "🧄", name: "กระเทียม", price: 20 },
+  { emoji: "🌶️", name: "พริกสด", price: 18 },
+  { emoji: "🥬", name: "ผักกาดขาว", price: 22 },
 ];
 
 const partners: Partner[] = [
@@ -229,6 +252,8 @@ export default function PartnersPage() {
   const [branchOpen, setBranchOpen]     = useState<string | null>(null);
   const [selectedBranchIdx, setSelectedBranchIdx] = useState<Record<string, number>>({});
 
+  const { missingItems } = useShoppingStore();
+
   const getBranchDistance = (p: Partner) =>
     p.branches[selectedBranchIdx[p.id] ?? 0]?.distance ?? p.distance;
 
@@ -387,14 +412,27 @@ export default function PartnersPage() {
                 >
                   ดูสาขา
                 </button>
-                <a
-                  href={partner.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 rounded-xl bg-emerald-500 py-2 text-center text-[12px] font-semibold text-white transition hover:bg-emerald-600"
+                <button
+                  onClick={() => {
+                    if (missingItems.length > 0) {
+                      window.open(`/store-cart?partner=${partner.id}`, "_blank", "noopener,noreferrer");
+                    } else {
+                      window.open(partner.websiteUrl, "_blank", "noopener,noreferrer");
+                    }
+                  }}
+                  className={`flex-1 rounded-xl py-2 text-center text-[12px] font-semibold text-white transition ${
+                    missingItems.length > 0
+                      ? "bg-emerald-600 hover:bg-emerald-700"
+                      : "bg-emerald-500 hover:bg-emerald-600"
+                  }`}
                 >
-                  ไปที่ร้านค้า
-                </a>
+                  {missingItems.length > 0 ? (
+                    <span className="flex items-center justify-center gap-1">
+                      <ShoppingCart className="h-3.5 w-3.5" />
+                      เพิ่มลงตะกร้า
+                    </span>
+                  ) : "ไปที่ร้านค้า"}
+                </button>
               </div>
 
               {/* Footer */}

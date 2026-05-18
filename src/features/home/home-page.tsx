@@ -12,6 +12,8 @@ import AppShell from "@/components/layout/app-shell";
 import Card, { StatCard } from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import { recordCook } from "@/lib/cook-stats";
+import { usePantryStore } from "@/store/pantry-store";
+import { useShoppingStore } from "@/store/shopping-store";
 
 const quickStats = [
   {
@@ -28,20 +30,6 @@ const quickStats = [
     iconClassName: "bg-amber-100 text-amber-500",
     icon: <TriangleAlert className="h-7 w-7" />,
   },
-  {
-    label: "งบประมาณเดือนนี้",
-    value: "฿1,250",
-    note: "คงเหลือ",
-    iconClassName: "bg-emerald-100 text-emerald-700",
-    icon: <Wallet className="h-7 w-7" />,
-  },
-  {
-    label: "ลดขยะอาหาร",
-    value: "40%",
-    note: "จากเดือนก่อน",
-    iconClassName: "bg-lime-100 text-lime-700",
-    icon: <Leaf className="h-7 w-7" />,
-  }
 ];
 
 const expiringItems = [
@@ -105,8 +93,8 @@ const expiringItems = [
 ];
 
 const recommendedPurchases = [
-  { id: "eggs",  name: "ไข่ไก่ (30 ฟอง)", daysLeft: 2, emoji: "🥚" },
-  { id: "milk",  name: "นมสด 1 ลิตร",      daysLeft: 3, emoji: "🥛" },
+  { id: "eggs", name: "ไข่ไก่", daysLeft: 2, emoji: "🥚", required: 30, unit: "ฟอง" },
+  { id: "milk", name: "นมสด",  daysLeft: 3, emoji: "🥛", required: 1,  unit: "ลิตร" },
 ];
 
 const recipes = [
@@ -159,6 +147,8 @@ const recipes = [
 
 export default function HomeDashboardPage() {
   const router = useRouter();
+  const pantryItems = usePantryStore((s) => s.items);
+  const setMissingItems = useShoppingStore((s) => s.setMissingItems);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [cookingMenu, setCookingMenu] = useState<{ menuId: string; name: string; emoji: string; time: string } | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -224,6 +214,59 @@ export default function HomeDashboardPage() {
     [selectedItemId]
   );
 
+  // ── Dynamic stats from pantry store ────────────────────────────────────────
+  const dynamicStats = useMemo(() => {
+    const now = new Date();
+    const thisYear = now.getFullYear();
+    const thisMonth = now.getMonth();
+
+    // ค่าใช้จ่ายเดือนนี้: ผลรวม price × quantity ของ items ที่ createdAt อยู่ในเดือนนี้
+    const spendingThisMonth = pantryItems.reduce((sum, item) => {
+      if (!item.createdAt || item.price == null) return sum;
+      const d = new Date(item.createdAt);
+      if (d.getFullYear() === thisYear && d.getMonth() === thisMonth) {
+        return sum + item.price * item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    // ของเสียเดือนนี้: % ของ items ที่หมดอายุในเดือนนี้ เทียบกับ items ทั้งหมด
+    const expiredThisMonth = pantryItems.filter(
+      (item) => {
+        if (!item.expiresAt) return false;
+        const d = new Date(item.expiresAt);
+        return d < now && d.getFullYear() === thisYear && d.getMonth() === thisMonth;
+      },
+    );
+    const wastePercent =
+      pantryItems.length > 0
+        ? Math.round((expiredThisMonth.length / pantryItems.length) * 100)
+        : 0;
+
+    return { spendingThisMonth, wastePercent };
+  }, [pantryItems]);
+
+  const allStats = useMemo(
+    () => [
+      ...quickStats,
+      {
+        label: "ค่าใช้จ่ายเดือนนี้",
+        value: `฿${dynamicStats.spendingThisMonth.toLocaleString("th-TH", { maximumFractionDigits: 0 })}`,
+        note: "จากใบเสร็จสแกน",
+        iconClassName: "bg-emerald-100 text-emerald-700",
+        icon: <Wallet className="h-7 w-7" />,
+      },
+      {
+        label: "ของเสียเดือนนี้",
+        value: `${dynamicStats.wastePercent}%`,
+        note: "วัตถุดิบหมดอายุในเดือนนี้",
+        iconClassName: "bg-lime-100 text-lime-700",
+        icon: <Leaf className="h-7 w-7" />,
+      },
+    ],
+    [dynamicStats],
+  );
+
   return (
     <AppShell title="หน้าหลัก" subtitle="สรุปภาพรวมการจัดการอาหารในบ้านของคุณ">
       <div className="relative overflow-hidden rounded-2xl border border-emerald-900/60 bg-gradient-to-r from-emerald-950/80 via-emerald-900/40 to-green-950/60 p-4 sm:p-6">
@@ -269,7 +312,7 @@ export default function HomeDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {quickStats.map((stat) => (
+        {allStats.map((stat) => (
           <StatCard
             key={stat.label}
             label={stat.label}
@@ -459,7 +502,13 @@ export default function HomeDashboardPage() {
                 {/* Order button */}
                 <button
                   type="button"
-                  onClick={() => router.push("/partners")}
+                  onClick={() => {
+                    setMissingItems(
+                      [{ name: item.name, emoji: item.emoji, required: item.required, unit: item.unit }],
+                      "สั่งซื้อวัตถุดิบที่แนะนำ",
+                    );
+                    router.push("/partners");
+                  }}
                   className="shrink-0 rounded-lg border border-emerald-600/60 px-4 py-2 text-sm font-semibold text-emerald-400 transition hover:bg-emerald-900/30"
                 >
                   สั่งซื้อ

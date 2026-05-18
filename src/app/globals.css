@@ -92,8 +92,8 @@ html:not(.dark) section.bg-slate-900 {
   background-color: #ffffff !important;
 }
 
-/* Sidebar logo card — white bg + green border */
-html:not(.dark) aside > div:first-child {
+/* Sidebar logo card — white bg + green border (scoped to app-shell aside only) */
+html:not(.dark) aside.bg-slate-50 > div:first-child {
   background-color: #ffffff !important;
   border-color: #86efac !important;
 }
@@ -707,4 +707,27 @@ html:not(.dark) .datepicker-popup .bg-emerald-900\/20 {
 }
 html:not(.dark) .datepicker-popup .border-emerald-700\/30 {
   border-color: rgba(5, 150, 105, 0.2) !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   Login page light mode overrides
+   ════════════════════════════════════════════════════════ */
+
+/* Aside green gradient → soft mint gradient */
+html:not(.dark) .from-emerald-900\/40 {
+  --tw-gradient-from: #ecfdf5 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(240 253 244 / 0)) !important;
+}
+html:not(.dark) .to-emerald-900\/20 {
+  --tw-gradient-to: #f0fdf4 !important;
+}
+
+/* Feature item ring in aside */
+html:not(.dark) .ring-emerald-800\/60 {
+  --tw-ring-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+/* Input field focus ring */
+html:not(.dark) .focus-within\:ring-emerald-900\/50:focus-within {
+  --tw-ring-color: rgba(5, 150, 105, 0.15) !important;
 }

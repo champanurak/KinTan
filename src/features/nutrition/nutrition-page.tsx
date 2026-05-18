@@ -205,7 +205,7 @@ export default function NutritionPage() {
       {activeTab === 0 ? (
         <div className="space-y-5">
           {/* Row 1 — 4 stat cards */}
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="aaaa grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
             {/* TDEE card */}
             <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 flex flex-col gap-3">
               <div className="flex items-center gap-1.5">

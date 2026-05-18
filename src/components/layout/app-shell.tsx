@@ -105,11 +105,11 @@ const navItems: NavItem[] = [
     label: "รายงาน",
     icon: <BarChart2 className="h-4 w-4" />,
   },
-  {
-    href: "/ai-chat",
-    label: "ผู้ช่วย AI",
-    icon: <MessageCircle className="h-4 w-4" />,
-  },
+  // {
+  //   href: "/ai-chat",
+  //   label: "ผู้ช่วย AI",
+  //   icon: <MessageCircle className="h-4 w-4" />,
+  // },
   {
     href: "/settings",
     label: "ตั้งค่า",

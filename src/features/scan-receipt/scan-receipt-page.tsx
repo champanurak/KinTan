@@ -54,7 +54,7 @@ function presetForCategory(name: string) {
   return CATEGORY_PRESETS_SC[name] ?? { icon: "🗂️", color: "bg-slate-100 text-slate-700 ring-slate-200" };
 }
 
-const COMMON_UNITS = ["ชิ้น", "ขวด", "กิโลกรัม", "กรัม", "แพ็ค", "โหล", "ลิตร", "มิลลิลิตร", "ฟอง", "ถุง", "กล่อง", "ห่อ"];
+const COMMON_UNITS = ["ชิ้น", "ขวด", "กิโลกรัม", "กรัม", "แพ็ค", "โหล", "ลิตร", "มิลลิลิตร", "ฟอง", "ถุง", "กล่อง", "ห่อ", "ลัง", "กระป๋อง"];
 
 const PRODUCT_IMG_KEYWORDS: [string, string][] = [
   ["ไก่",    "/products/chicken.svg"],
@@ -72,12 +72,21 @@ function matchToPantry(aiCat: string, pantryCategories: PantryCategory[]): strin
   const names = pantryCategories.map((c) => c.name);
   // 1. Exact match
   if (names.includes(aiCat)) return aiCat;
-  // 2. Prefix / substring match (e.g. "นมและผลิตภัณฑ์นม" → "นมและเนย")
+  // 2. Case-insensitive exact match
+  const lower = aiCat.toLowerCase();
+  const exactCI = names.find((n) => n.toLowerCase() === lower);
+  if (exactCI) return exactCI;
+  // 3. Substring match — AI category contains pantry name or vice versa (at least 4 chars)
   const sub = names.find(
-    (n) => n.includes(aiCat.slice(0, 3)) || aiCat.includes(n.slice(0, 3))
+    (n) => n.length >= 4 && (aiCat.includes(n) || n.includes(aiCat))
   );
   if (sub) return sub;
-  // 3. No match — keep AI category (will be created as new on save)
+  // 4. Prefix match — first 3 chars
+  const prefix = names.find(
+    (n) => n.slice(0, 3) === aiCat.slice(0, 3)
+  );
+  if (prefix) return prefix;
+  // 5. No match — keep AI category (will be created as new on save)
   return aiCat;
 }
 
@@ -90,6 +99,7 @@ export default function ScanReceiptPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [receiptTotal, setReceiptTotal] = useState<number | null>(null);
 
   // Demo mode: ?demo=2 in URL loads step 2 with mock items
   useEffect(() => {
@@ -133,6 +143,9 @@ export default function ScanReceiptPage() {
     try {
       const fd = new FormData();
       fd.append("image", file);
+      // ส่งชื่อหมวดหมู่จากคลังวัตถุดิบไปพร้อมกับ request
+      const currentCategories = usePantryStore.getState().categories;
+      fd.append("categories", JSON.stringify(currentCategories.map((c) => c.name)));
       const res = await fetch("/api/analyze", { method: "POST", body: fd });
       if (!res.ok) throw new Error("API error");
       const data = await res.json();
@@ -143,12 +156,13 @@ export default function ScanReceiptPage() {
           price: it.price ?? 0,
           quantity: it.quantity ?? 1,
           unit: it.unit ?? "ชิ้น",
-          // auto-match AI category to closest existing pantry category
-          category: matchToPantry(it.category ?? "อื่นๆ", usePantryStore.getState().categories),
+          // match กับหมวดในคลัง (AI ควรใช้ชื่อตรงอยู่แล้ว แต่ fallback ไว้กรณี mismatch)
+          category: matchToPantry(it.category ?? "อื่นๆ", currentCategories),
         })
       );
       if (mapped.length === 0) throw new Error("no_items");
       setItems((prev) => merge ? [...prev, ...mapped] : mapped);
+      if (!merge) setReceiptTotal(typeof data.total === "number" && data.total > 0 ? data.total : null);
       setStep(2);
     } catch (err: unknown) {
       const msg = err instanceof Error && err.message === "no_items"
@@ -454,12 +468,12 @@ export default function ScanReceiptPage() {
       {/* dismiss popover on outside click */}
       {step === 2 && (
         <div
-          className="grid gap-5 lg:grid-cols-[1fr_320px]"
+          className="grid gap-5 xl:grid-cols-[1fr_300px]"
           onClick={() => { setShowItemMenu(null); setCategoryPopover(null); }}
         >
 
           {/* ── Left panel: Items list ─────────────────────── */}
-          <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
+          <div className="min-w-0 rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
 
             {/* Header */}
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -609,13 +623,13 @@ export default function ScanReceiptPage() {
                                 </div>
                               ) : (
                                 /* ── Normal display row ── */
-                                <div className="flex items-center gap-3 px-4 py-3">
+                                <div className="flex items-center gap-2 px-4 py-3">
                                   {/* Product image / emoji */}
-                                  <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-700/50">
+                                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-700/50">
                                     {imgSrc ? (
                                       <Image src={imgSrc} alt={item.name} fill className="object-contain p-1" />
                                     ) : (
-                                      <span className="text-xl leading-none">{categoryEmoji(item.category)}</span>
+                                      <span className="text-lg leading-none">{categoryEmoji(item.category)}</span>
                                     )}
                                   </div>
 
@@ -626,15 +640,15 @@ export default function ScanReceiptPage() {
                                   </div>
 
                                   {/* Qty controls */}
-                                  <div className="flex shrink-0 items-center gap-1">
+                                  <div className="flex shrink-0 items-center gap-0.5">
                                     <button
                                       onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                                      className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-600 text-slate-300 hover:bg-slate-700"
+                                      className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-600 text-slate-300 hover:bg-slate-700"
                                     >−</button>
-                                    <span className="w-6 text-center text-sm font-semibold text-slate-100">{item.quantity}</span>
+                                    <span className="w-5 text-center text-sm font-semibold text-slate-100">{item.quantity}</span>
                                     <button
                                       onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                                      className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-600 text-slate-300 hover:bg-slate-700"
+                                      className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-600 text-slate-300 hover:bg-slate-700"
                                     >+</button>
                                   </div>
 
@@ -643,7 +657,7 @@ export default function ScanReceiptPage() {
                                     value={item.unit}
                                     onChange={(e) => updateItemUnit(item.id, e.target.value)}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="shrink-0 cursor-pointer rounded-lg border border-slate-600 bg-slate-700 px-2 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
+                                    className="w-16 shrink-0 cursor-pointer rounded-lg border border-slate-600 bg-slate-700 px-1.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
                                   >
                                     {COMMON_UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
                                   </select>
@@ -707,14 +721,14 @@ export default function ScanReceiptPage() {
               <Check className="h-5 w-5 shrink-0 text-emerald-400" />
               <div>
                 <p className="text-sm font-medium text-slate-200">ตรวจพบสินค้า {items.length} รายการ</p>
-                <p className="text-xs font-semibold text-emerald-400">รวมทั้งหมด {totalPrice.toFixed(2)} บาท</p>
+                <p className="text-xs font-semibold text-emerald-400">รวมทั้งหมด {(receiptTotal ?? totalPrice).toFixed(2)} บาท</p>
               </div>
             </div>
 
             {/* Navigation */}
             <div className="mt-5 flex gap-3">
               <button
-                onClick={() => { setStep(1); setUploadedImageUrl(null); }}
+                onClick={() => { setStep(1); setUploadedImageUrl(null); setReceiptTotal(null); }}
                 className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
               >
                 ย้อนกลับ
@@ -748,7 +762,7 @@ export default function ScanReceiptPage() {
               <div className="space-y-2.5">
                 {[
                   { label: "จำนวนรายการ", value: `${items.length} รายการ`, muted: false },
-                  { label: "ราคารวม",      value: `${totalPrice.toFixed(2)} บาท`, muted: false },
+                  { label: "ราคารวม",      value: `${(receiptTotal ?? totalPrice).toFixed(2)} บาท`, muted: false },
                   { label: "ส่วนลด",       value: "-", muted: true },
                   { label: "ภาษี (ถ้ามี)", value: "-", muted: true },
                 ].map(({ label, value, muted }) => (
@@ -759,7 +773,7 @@ export default function ScanReceiptPage() {
                 ))}
                 <div className="flex justify-between border-t border-slate-700/60 pt-2.5">
                   <span className="font-semibold text-slate-100">ยอดสุทธิ</span>
-                  <span className="font-bold text-emerald-400">{totalPrice.toFixed(2)} บาท</span>
+                  <span className="font-bold text-emerald-400">{(receiptTotal ?? totalPrice).toFixed(2)} บาท</span>
                 </div>
               </div>
             </div>
@@ -801,7 +815,7 @@ export default function ScanReceiptPage() {
             </div>
             <div className="border-t border-slate-600 mt-3 pt-3 flex justify-between font-semibold">
               <span className="text-slate-300">รวมทั้งหมด</span>
-              <span className="text-emerald-400">{totalPrice.toFixed(2)} บาท</span>
+              <span className="text-emerald-400">{(receiptTotal ?? totalPrice).toFixed(2)} บาท</span>
             </div>
           </div>
 

@@ -395,7 +395,7 @@ export default function ReportsPage() {
           </div>
 
           {/* ── Row 3: Category donut + Summary + Popular menus ────────── */}
-          <div className="grid gap-4 xl:grid-cols-5">
+          <div className="grid gap-4 xl:grid-cols-3">
             {/* Category donut (2/5) */}
             <div className="xl:col-span-2 rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
               <h3 className="text-sm font-semibold text-slate-200 mb-4">แยกตามหมวดค่าใช้จ่าย</h3>
@@ -443,7 +443,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Popular menus (2/5) */}
-            <div className="xl:col-span-2 rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
+            <div className="xl:col-span-3 rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-slate-200">เมนูยอดนิยม</h3>
               </div>
